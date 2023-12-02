@@ -171,11 +171,17 @@ public class User extends AudioCollection{
         player.stop();
 
         lastSearched = true;
+
         ArrayList<String> results = new ArrayList<>();
         List<LibraryEntry> libraryEntries = searchBar.search(filters, type);
 
         for (LibraryEntry libraryEntry : libraryEntries) {
             results.add(libraryEntry.getName());
+        }
+
+        if (type.equals("artist")) {
+            Set<String> uniqueResults = new LinkedHashSet<>(results);
+            results = new ArrayList<>(uniqueResults);
         }
         return results;
     }
@@ -191,7 +197,7 @@ public class User extends AudioCollection{
         if (selected == null)
             return "The selected ID is too high.";
         for (User user : Admin.getUsers()) {
-            if (user.getUsername().equals(selected.getName()) && user.getType().equals("artist"))
+            if (user.getUsername().equals(selected.getName()) && (user.getType().equals("artist") || user.getType().equals("host")))
                 return "Successfully selected %s's page.".formatted(selected.getName());
         }
         return "Successfully selected %s.".formatted(selected.getName());
@@ -502,9 +508,15 @@ public class User extends AudioCollection{
         if (this.getType().equals("host")) {
             for (User user : Admin.getUsers()) {
                 for (Podcast podcast : this.getPodcasts())
-                    if (user.getPlayer().getCurrentAudioFile() != null && podcast.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
-                        return getUsername() + " can't be deleted.";
+                    for (Episode episode : podcast.getEpisodes()) {
+                        if (user.getPlayer().getCurrentAudioFile() != null && episode.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
+                            return getUsername() + " can't be deleted.";
+                    }
             }
+            Admin.getHosts().remove(this);
+            for (Podcast podcast : Admin.getPodcasts())
+                if (podcast.getOwner().equals(this.getUsername()))
+                    Admin.getPodcasts().remove(podcast);
         }
 
         if (this.getType().equals("artist")) {
@@ -514,17 +526,15 @@ public class User extends AudioCollection{
                         if (user.getPlayer().getCurrentAudioFile() != null && user.getPlayer().getCurrentAudioFile().getName().equals(song.getName()))
                             return getUsername() + " can't be deleted.";
             }
+            Admin.getArtists().remove(this);
+            for (Album album : this.getAlbums())
+                Admin.getAlbums().remove(album);
+            for (Song song : Admin.getSongs())
+                if (song.getArtist().equals(this.getUsername())) {
+                    Admin.getSongs().remove(song);
+                }
         }
 
-        Admin.getArtists().remove(this);
-        for (Album album : this.getAlbums())
-            Admin.getAlbums().remove(album);
-        for (Song song : Admin.getSongs())
-            if (song.getArtist().equals(this.getUsername())) {
-                Admin.getSongs().remove(song);
-                if (song.getName().equals("Rapid Fire"))
-                    Admin.getSongs().remove(song);
-            }
         Admin.getUsers().remove(this);
 
         return message;

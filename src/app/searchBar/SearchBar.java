@@ -146,13 +146,22 @@ public class SearchBar {
                 if (filters.getDescription() != null) {
                     entries = filterByDescription(entries, filters.getDescription());
                 }
+
+                Set<LibraryEntry> uniqueEntries = new LinkedHashSet<>(entries);
+                entries = new ArrayList<>(uniqueEntries);
+                break;
+            case "host":
+                entries = new ArrayList<>(Admin.getHostHelpers());
+                if (filters.getName() != null) {
+                    entries = filterByName(entries, filters.getName());
+                }
                 break;
             default:
                 entries = new ArrayList<>();
         }
 
-//        Set<LibraryEntry> uniqueEntries = new LinkedHashSet<>(entries);
-//        entries = new ArrayList<>(uniqueEntries);
+        Set<LibraryEntry> uniqueEntries = new LinkedHashSet<>(entries);
+        entries = new ArrayList<>(uniqueEntries);
 
         while (entries.size() > MAX_RESULTS) {
             entries.remove(entries.size() - 1);

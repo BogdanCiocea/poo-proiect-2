@@ -84,6 +84,10 @@ public class CommandRunner {
                 Admin.getArtists().add(newUser);
                 ArtistHelper artistHelper = new ArtistHelper(newUser.getUsername(), newUser.getAlbums());
                 Admin.getArtistHelpers().add(artistHelper);
+            } else if (newUser.getType().equals("host")) {
+                Admin.getHosts().add(newUser);
+                HostHelper hostHelper = new HostHelper(newUser.getUsername(), newUser.getPodcasts());
+                Admin.getHostHelpers().add(hostHelper);
             }
             Admin.getUsers().add(newUser);
             message = "The username " + newUser.getUsername() + " has been added successfully.";

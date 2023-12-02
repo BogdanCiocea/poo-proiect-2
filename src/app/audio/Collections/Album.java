@@ -14,6 +14,14 @@ public class Album {
     private String description = null;
     private String owner;
 
+    public Integer getTotalLikes() {
+        Integer likes = 0;
+        for (Song song : songs)
+            likes += song.getLikes();
+
+        return likes;
+    }
+
     public String getOwner() {
         return owner;
     }

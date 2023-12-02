@@ -17,32 +17,52 @@ public class Player {
     @Getter
     private String type;
 
-    public void setPaused(boolean paused) {
-        this.paused = paused;
-    }
-
     public Enums.RepeatMode getRepeatMode() {
         return repeatMode;
+    }
+
+    public void setRepeatMode(Enums.RepeatMode repeatMode) {
+        this.repeatMode = repeatMode;
     }
 
     public boolean isShuffle() {
         return shuffle;
     }
 
+    public void setShuffle(boolean shuffle) {
+        this.shuffle = shuffle;
+    }
+
     public boolean isPaused() {
         return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     public PlayerSource getSource() {
         return source;
     }
 
+    public void setSource(PlayerSource source) {
+        this.source = source;
+    }
+
     public String getType() {
         return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public ArrayList<PodcastBookmark> getBookmarks() {
         return bookmarks;
+    }
+
+    public void setBookmarks(ArrayList<PodcastBookmark> bookmarks) {
+        this.bookmarks = bookmarks;
     }
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
@@ -79,6 +99,8 @@ public class Player {
             return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry);
         } else if ("podcast".equals(type)) {
             return createPodcastSource((AudioCollection) entry, bookmarks);
+        } else if ("album".equals(type)) {
+
         }
 
         return null;
@@ -145,8 +167,8 @@ public class Player {
     }
 
     public void simulatePlayer(int time) {
-        if (source != null && !paused) {
-            while (time >= source.getDuration() ) {
+        if (!paused && this.source != null) {
+            while (time >= source.getDuration()) {
                 time -= source.getDuration();
                 next();
                 if (paused) {

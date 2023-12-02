@@ -17,6 +17,16 @@ public class Admin {
     private static List<ArtistHelper> artistHelpers = new ArrayList<>();
     private static List<AlbumHelper> albumHelpers = new ArrayList<>();
     private static List<AlbumSearchHelper> albumSearchHelpers = new ArrayList<>();
+    private static List<User> hosts = new ArrayList<>();
+    private static List<HostHelper> hostHelpers = new ArrayList<>();
+
+    public static List<User> getHosts() {
+        return hosts;
+    }
+
+    public static List<HostHelper> getHostHelpers() {
+        return hostHelpers;
+    }
 
     public static List<AlbumSearchHelper> getAlbumSearchHelpers() {
         return albumSearchHelpers;
@@ -160,22 +170,18 @@ public class Admin {
 
     public static List<String> getTop5Albums() {
         Map<String, Integer> albumLikes = new HashMap<>();
-        for (Song song : songs) {
-            String albumName = song.getAlbum();
-            int likes = song.getLikes();
-            albumLikes.put(albumName, albumLikes.getOrDefault(albumName, 0) + likes);
-        }
-
-        albumLikes.entrySet().removeIf(entry -> entry.getValue() == 0);
-
-        List<Map.Entry<String, Integer>> sortedAlbums = new ArrayList<>(albumLikes.entrySet());
-        sortedAlbums.sort(Map.Entry.<String, Integer>comparingByValue().reversed());
-
+        List<Album> albums1 = new ArrayList<>(getAlbums());
+        albums1.sort(Comparator.comparingInt(Album::getTotalLikes).reversed());
         List<String> topAlbums = new ArrayList<>();
-        for (int i = 0; i < Math.min(sortedAlbums.size(), 5); i++) {
-            topAlbums.add(sortedAlbums.get(i).getKey());
+        int count = 0;
+        for (Album albumz : albums1) {
+            if (count >= 5)
+                break;
+            topAlbums.add(albumz.getName());
+            count++;
         }
-
+        Set<String> uniqueAlbums = new LinkedHashSet<>(topAlbums);
+        topAlbums = new ArrayList<>(uniqueAlbums);
         return topAlbums;
     }
 

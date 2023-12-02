@@ -170,13 +170,13 @@
   "command" : "search",
   "user" : "soundseeker21",
   "timestamp" : 625,
-  "message" : "Search returned 0 results",
-  "results" : [ ]
+  "message" : "Search returned 1 results",
+  "results" : [ "audiosage" ]
 }, {
   "command" : "select",
   "user" : "soundseeker21",
   "timestamp" : 630,
-  "message" : "The selected ID is too high."
+  "message" : "Successfully selected audiosage's page."
 }, {
   "command" : "search",
   "user" : "carol19",
@@ -258,7 +258,7 @@
   "command" : "deleteUser",
   "user" : "musicmaven",
   "timestamp" : 6900,
-  "message" : "musicmaven was successfully deleted."
+  "message" : "musicmaven can't be deleted."
 }, {
   "command" : "repeat",
   "user" : "carol19",

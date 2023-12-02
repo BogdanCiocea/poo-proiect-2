@@ -298,5 +298,5 @@
 }, {
   "command" : "getTop5Albums",
   "timestamp" : 3480,
-  "result" : [ "A Night at the Opera", "Harmonic Horizons", "Goats Head Soup" ]
+  "result" : [ "Harmonic Horizons", "Harmonic Horizons 2" ]
 } ]

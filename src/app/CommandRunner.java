@@ -1,5 +1,6 @@
 package app;
 
+import app.announcement.Announcement;
 import app.audio.Collections.*;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
@@ -8,6 +9,7 @@ import app.audio.LibraryEntry;
 import app.event.Event;
 import app.merch.Merch;
 import app.player.PlayerStats;
+import app.prints.PodcastPrint;
 import app.searchBar.Filters;
 import app.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,12 +39,15 @@ public class CommandRunner {
                 user.setCurrentPage("Artist");
                 Set<String> uniqueResults = new LinkedHashSet<>(results);
                 results = new ArrayList<>(uniqueResults);
+            } else if (type.equals("host")) {
+                user.setCurrentPage("Host");
+                Set<String> uniqueResults = new LinkedHashSet<>(results);
+                results = new ArrayList<>(uniqueResults);
             }
             message = "Search returned " + results.size() + " results";
         } else {
             message = commandInput.getUsername() + " is offline.";
         }
-
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
@@ -74,6 +79,8 @@ public class CommandRunner {
     public static ObjectNode addUser(CommandInput commandInput) {
         User newUser = Admin.getUser(commandInput.getUsername());
         String message;
+        if (Admin.getHosts().isEmpty())
+            Admin.getHostHelpers().clear();
         if (newUser != null) {
             message = "The username " + newUser.getUsername() + " is already taken.";
         } else {
@@ -85,6 +92,8 @@ public class CommandRunner {
                 ArtistHelper artistHelper = new ArtistHelper(newUser.getUsername(), newUser.getAlbums());
                 Admin.getArtistHelpers().add(artistHelper);
             } else if (newUser.getType().equals("host")) {
+                if (Admin.getHosts().isEmpty())
+                    Admin.getHostHelpers().clear();
                 Admin.getHosts().add(newUser);
                 HostHelper hostHelper = new HostHelper(newUser.getUsername(), newUser.getPodcasts());
                 Admin.getHostHelpers().add(hostHelper);
@@ -159,6 +168,24 @@ public class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode removeEvent(CommandInput commandInput) {
+        String message;
+        User user = Admin.getUser(commandInput.getUsername());
+
+        if (user == null)
+            message = "The username " + commandInput.getUsername() + " doesn't exist.";
+        else
+            message = user.removeEvent(commandInput.getName());
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
     public static ObjectNode deleteUser(CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         String message;
@@ -168,6 +195,16 @@ public class CommandRunner {
         } else
             message = user.deleteUser();
 
+        if (message.equals(commandInput.getUsername() + " was successfully deleted.")) {
+            assert user != null;
+            if (user.getType() != null && user.getType().equals("artist")) {
+                for (Album album : user.getAlbums()) {
+                    Admin.getSongs().removeAll(album.getSongs());
+                }
+                    Admin.getUsers().remove(user);
+            }
+        }
+
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
@@ -176,6 +213,21 @@ public class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode removeALbum(CommandInput commandInput) {
+        User artist = Admin.getUser(commandInput.getUsername());
+        String message;
+        if (artist == null)
+            message = "The username " + commandInput.getUsername() + " doesn't exist.";
+        else
+            message = artist.removeAlbum(commandInput.getUsername(), commandInput.getName());
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
     public static ObjectNode select(CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         String message;
@@ -378,6 +430,10 @@ public class CommandRunner {
         else
             message = user.addAlbum(commandInput);
 
+        Set<Song> correctSongList = new LinkedHashSet<>(Admin.getSongs());
+        List<Song> newListSong = new ArrayList<>(correctSongList);
+        Admin.setSongsNew(newListSong);
+
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
@@ -411,7 +467,7 @@ public class CommandRunner {
 
     public static ObjectNode printCurrentPage(CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
-        String message = null;
+        String message = "mama ta";
         List<Song> likedSongs = new ArrayList<>(user.getLikedSongs());
 
         // Sort liked songs by the number of likes and limit to top 5
@@ -452,18 +508,82 @@ public class CommandRunner {
         } else if (user.getCurrentPage().equals("Artist") && user.getSearchBar().getLastSelected() != null) {
             User artist = Admin.getUser(user.getSearchBar().getLastSelected().getName());
             List<String> albums = new ArrayList<>();
-            for (Album album : artist.getAlbums())
-                albums.add(album.getName());
-            List<String> merches = new ArrayList<>();
-            for (Merch merch1 : artist.getMerches())
-                merches.add(merch1.getName() + " - " + merch1.getPrice() + ":\n\t" + merch1.getDescription());
-            List<String> artistEvents = new ArrayList<>();
-            for (Event event : artist.getEvents())
-                artistEvents.add(event.getName() + " - " + event.getDate() + ":\n\t" + event.getDescription());
-            message = "Albums:\n\t" + albums + "\n\nMerch:\n\t" + merches + "\n\nEvents:\n\t" + artistEvents;
-        } else if (user.getCurrentPage().equals("Host")) {
+            if (artist != null) {
+                for (Album album : artist.getAlbums())
+                    albums.add(album.getName());
 
+                List<String> merches = new ArrayList<>();
+                for (Merch merch1 : artist.getMerches())
+                    merches.add(merch1.getName() + " - " + merch1.getPrice() + ":\n\t" + merch1.getDescription());
+
+                List<String> artistEvents = new ArrayList<>();
+                for (Event event : artist.getEvents())
+                    artistEvents.add(event.getName() + " - " + event.getDate() + ":\n\t" + event.getDescription());
+                message = "Albums:\n\t" + albums + "\n\nMerch:\n\t" + merches + "\n\nEvents:\n\t" + artistEvents;
+            } else
+                message = user.getLastPageMessage();
+        } else if (user.getCurrentPage().equals("Host")) {
+            List<String> podcasts = new ArrayList<>();
+            User host = null;
+            if (user.getSearchBar().getLastSelected() != null) {
+                host = Admin.getUser(user.getSearchBar().getLastSelected().getName());
+            } else
+                host = Admin.getUser(user.getLastUserSelected());
+            if (host != null) {
+                List<String> episodes = new ArrayList<>();
+                List<PodcastPrint> podcastPrints = new ArrayList<>();
+                for (Podcast podcast : host.getPodcasts()) {
+                    episodes = new ArrayList<>();
+                    for (Episode episode : podcast.getEpisodes())
+                        episodes.add(episode.getName() + " - " + episode.getDescription());
+                    podcastPrints.add(new PodcastPrint(podcast.getName(), episodes));
+                }
+
+                List<String> announcements = new ArrayList<>();
+                for (Announcement announcement : host.getAnnouncements())
+                    announcements.add(announcement.getName() + ":\n\t" + announcement.getDescription() + "\n");
+                message = "Podcasts:\n\t" + podcastPrints + "\n\nAnnouncements:\n\t" + announcements;
+
+                user.setLastUserSelected(host.getUsername());
+            } else
+                message = user.getLastPageMessage();
         }
+        user.setLastPageMessage(message);
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
+    public static ObjectNode addAnnouncement(CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        String message;
+
+        if (user == null) {
+            message = "The username " + commandInput.getUsername() + " doesn't exist.";
+        } else
+            message = user.addAnnouncement(commandInput.getName(), commandInput.getDescription());
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+
+        return objectNode;
+    }
+
+    public static ObjectNode removeAnnouncement(CommandInput commandInput) {
+        User user = Admin.getUser(commandInput.getUsername());
+        String message;
+
+        if (user == null) {
+            message = "The username " + commandInput.getUsername() + " doesn't exist.";
+        } else
+            message = user.removeAnnouncement(commandInput.getName());
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());

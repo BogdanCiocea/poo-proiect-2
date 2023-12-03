@@ -27,9 +27,7 @@ public abstract class LibraryEntry {
     }
 
     public boolean matchesName(String name) {
-        if (getName() != null)
-            return getName().toLowerCase().startsWith(name.toLowerCase());
-        return false;
+        return getName().toLowerCase().startsWith(name.toLowerCase());
     }
     public boolean matchesAlbum(String album) { return false; }
     public boolean matchesTags(ArrayList<String> tags) { return false; }

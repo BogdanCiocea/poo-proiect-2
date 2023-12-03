@@ -7,10 +7,11 @@ import app.user.User;
 import fileio.input.*;
 
 import java.util.*;
+import java.util.jar.JarInputStream;
 
 public class Admin {
     private static List<User> users = new ArrayList<>();
-    private static ArrayList<Song> songs = new ArrayList<>();
+    private static List<Song> songs = new ArrayList<>();
     private static List<Podcast> podcasts = new ArrayList<>();
     private static ArrayList<Album> albums = new ArrayList<>();
     private static List<User> artists = new ArrayList<>();
@@ -67,6 +68,16 @@ public class Admin {
         return songs;
     }
 
+    public static List<Song> setSongsNew(List<Song> songInputList) {
+        songs = new ArrayList<>();
+        for (Song songInput : songInputList) {
+            songs.add(new Song(songInput.getName(), songInput.getDuration(), songInput.getAlbum(),
+                    songInput.getTags(), songInput.getLyrics(), songInput.getGenre(),
+                    songInput.getReleaseYear(), songInput.getArtist()));
+        }
+        return songs;
+    }
+
     public static List<Song> addSongs(List<SongInput> songInputList) {
         List<Song> songList = new ArrayList<>();
         for (SongInput songInput : songInputList) {
@@ -100,6 +111,8 @@ public class Admin {
         return new ArrayList<>(songs);
     }
 
+    public static List<Song> getSongsList() { return songs; }
+
     public static List<Podcast> getAdminPodcasts() {
         return podcasts;
     }
@@ -107,6 +120,7 @@ public class Admin {
         return new ArrayList<>(podcasts);
     }
 
+    public static List<Podcast> getPodcastsList() { return podcasts; }
     public static List<Playlist> getPlaylists() {
         List<Playlist> playlists = new ArrayList<>();
         for (User user : users) {
@@ -205,6 +219,13 @@ public class Admin {
         users = new ArrayList<>();
         songs = new ArrayList<>();
         podcasts = new ArrayList<>();
+        hostHelpers = new ArrayList<>();
+        albumHelpers = new ArrayList<>();
+        albums = new ArrayList<>();
+        hosts = new ArrayList<>();
+        artists = new ArrayList<>();
+        artistHelpers = new ArrayList<>();
+        albumSearchHelpers = new ArrayList<>();
         timestamp = 0;
     }
 }

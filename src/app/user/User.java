@@ -2,6 +2,7 @@ package app.user;
 
 import app.Admin;
 import app.CommandRunner;
+import app.announcement.Announcement;
 import app.audio.Collections.*;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
@@ -25,6 +26,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class User extends AudioCollection{
     @Getter
     private String username;
@@ -45,6 +50,29 @@ public class User extends AudioCollection{
     private String currentPage = "Home";
     private List<Merch> merches = new ArrayList<>();
     private List<Podcast> podcasts = new ArrayList<>();
+    private List<Announcement> announcements = new ArrayList<>();
+    private String lastPageMessage;
+    private String lastUserSelected;
+
+    public String getLastUserSelected() {
+        return lastUserSelected;
+    }
+
+    public void setLastUserSelected(String lastUserSelected) {
+        this.lastUserSelected = lastUserSelected;
+    }
+
+    public String getLastPageMessage() {
+        return lastPageMessage;
+    }
+
+    public void setLastPageMessage(String lastPageMessage) {
+        this.lastPageMessage = lastPageMessage;
+    }
+
+    public List<Announcement> getAnnouncements() {
+        return announcements;
+    }
 
     public List<Podcast> getPodcasts() {
         return podcasts;
@@ -179,10 +207,11 @@ public class User extends AudioCollection{
             results.add(libraryEntry.getName());
         }
 
-        if (type.equals("artist")) {
+        if (type.equals("artist") || type.equals("host")) {
             Set<String> uniqueResults = new LinkedHashSet<>(results);
             results = new ArrayList<>(uniqueResults);
         }
+
         return results;
     }
 
@@ -197,8 +226,9 @@ public class User extends AudioCollection{
         if (selected == null)
             return "The selected ID is too high.";
         for (User user : Admin.getUsers()) {
-            if (user.getUsername().equals(selected.getName()) && (user.getType().equals("artist") || user.getType().equals("host")))
+            if (user.getUsername().equals(selected.getName()) && (user.getType().equals("artist") || user.getType().equals("host"))) {
                 return "Successfully selected %s's page.".formatted(selected.getName());
+            }
         }
         return "Successfully selected %s.".formatted(selected.getName());
     }
@@ -230,6 +260,7 @@ public class User extends AudioCollection{
         else
             return "Playback resumed successfully.";
     }
+
 
     public String repeat() {
         if (player.getCurrentAudioFile() == null)
@@ -273,6 +304,34 @@ public class User extends AudioCollection{
         player.skipNext();
 
         return "Skipped forward successfully.";
+    }
+
+    public String addAnnouncement(String name, String description) {
+        String message = this.getUsername() + " has successfully added new announcement.";
+
+        if (this.getType() != null && !this.getType().equals("host"))
+            return this.getUsername() + " is not a host.";
+
+        for (Announcement announcement : this.getAnnouncements())
+            if (announcement.getName().equals(name))
+                return this.getUsername() + "  has already added an announcement with this name.";
+
+        this.getAnnouncements().add(new Announcement(name, description));
+
+        return message;
+    }
+
+    public String removeAnnouncement(String name) {
+        if (this.getType() != null && !this.getType().equals("host"))
+            return this.getUsername() + " is not a host.";
+
+        for (Announcement announcement : this.getAnnouncements())
+            if (announcement.getName().equals(name)) {
+                this.getAnnouncements().remove(announcement);
+                return this.getUsername() + " has successfully deleted the announcement.";
+            }
+
+        return this.getUsername() + " has no announcement with the given name.";
     }
 
     public String backward() {
@@ -486,30 +545,75 @@ public class User extends AudioCollection{
         Admin.setSongList(commandInput.getSongs());
         Admin.getAlbums().add(album);
 
+        Set<Song> newSongs = new LinkedHashSet<>(Admin.getSongs());
+        for (Song song : newSongs)
+            if (!Admin.getSongs().contains(song))
+                Admin.getSongs().add(song);
+
         return commandInput.getUsername() + " has added new album successfully.";
     }
 
+
     public String addEvent(CommandInput commandInput) {
-        String message = commandInput.getUsername() + " has added new event successfully.";
-
-        if ((this.getType() != null && !getType().equals("artist")) || this.getType() == null) {
-            message = commandInput.getUsername() + " is not an artist.";
+        if (this.getType() == null || !getType().equals("artist")) {
+            return commandInput.getUsername() + " is not an artist.";
         }
-        Event event = new Event(commandInput.getName(), commandInput.getDescription(), commandInput.getDate());
 
+        String dateString = commandInput.getDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate date;
+        try {
+            date = LocalDate.parse(dateString, formatter);
+        } catch (DateTimeParseException e) {
+            return "Event for " + commandInput.getUsername() + " does not have a valid date.";
+        }
+
+        // Check for invalid date conditions
+        if (date.getYear() < 1900 || date.getYear() > 2023 || date.getMonthValue() == 2 && date.getDayOfMonth() > 28) {
+            return "Event for " + commandInput.getUsername() + " does not have a valid date.";
+        }
+
+        // Check for event name uniqueness
+        for (Event existingEvent : this.getEvents()) {
+            if (existingEvent.getName().equals(commandInput.getName())) {
+                return commandInput.getUsername() + " has another event with the same name.";
+            }
+        }
+
+        Event event = new Event(commandInput.getName(), commandInput.getDescription(), dateString);
         this.getEvents().add(event);
 
-        return message;
+        return commandInput.getUsername() + " has added new event successfully.";
+    }
+
+    public String removeEvent(String eventName) {
+        if (this.getType() != null && !this.getType().equals("artist"))
+            return this.getUsername() + " is not an artist.";
+
+        int ok = 0;
+        for (Event event : this.getEvents())
+            if (event.getName().equals(eventName)) {
+                ok = 1;
+                break;
+            }
+
+        if (ok == 0)
+            return this.getUsername() + " doesn't have an event with the given name.";
+
+        this.getEvents().removeIf(event -> event.getName().equals(eventName));
+
+        return this.getUsername() + " deleted the event successfully.";
     }
 
     public String deleteUser() {
         String message = getUsername() + " was successfully deleted.";
 
-        if (this.getType().equals("host")) {
+        if (this.getType() != null && this.getType().equals("host")) {
             for (User user : Admin.getUsers()) {
                 for (Podcast podcast : this.getPodcasts())
                     for (Episode episode : podcast.getEpisodes()) {
-                        if (user.getPlayer().getCurrentAudioFile() != null && episode.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
+                        if (!this.getUsername().equals(user.getUsername()) && user.getPlayer().getSource() != null && (user.getPlayer().getCurrentAudioFile().getName().equals(episode.getName()) || (user.getSearchBar().getLastSelected() != null && user.getSearchBar().getLastSelected().getName().equals(this.getUsername()))))
                             return getUsername() + " can't be deleted.";
                     }
             }
@@ -519,25 +623,76 @@ public class User extends AudioCollection{
                     Admin.getPodcasts().remove(podcast);
         }
 
-        if (this.getType().equals("artist")) {
+        if (this.getType() != null && this.getType().equals("artist")) {
             for (User user : Admin.getUsers()) {
                 for (Album album : this.getAlbums())
                     for (Song song : album.getSongs())
                         if (user.getPlayer().getCurrentAudioFile() != null && user.getPlayer().getCurrentAudioFile().getName().equals(song.getName()))
                             return getUsername() + " can't be deleted.";
             }
-            Admin.getArtists().remove(this);
-            for (Album album : this.getAlbums())
-                Admin.getAlbums().remove(album);
-            for (Song song : Admin.getSongs())
-                if (song.getArtist().equals(this.getUsername())) {
-                    Admin.getSongs().remove(song);
+
+            if (this.getType() != null && this.getType().equals("artist")) {
+                List<Song> songsToRemove = new ArrayList<>();
+                for (Song song : Admin.getSongs()) {
+                    if (song.getArtist().equals(this.getUsername())) {
+                        Admin.getSongsList().remove(song);
+                        songsToRemove.add(song);
+                    }
                 }
+                for (User user : Admin.getUsers()) {
+                    for (Song song : songsToRemove)
+                        user.getLikedSongs().remove(song);
+                }
+                Admin.getSongsList().removeAll(songsToRemove);
+                Admin.getArtists().remove(this);
+            }
         }
 
-        Admin.getUsers().remove(this);
+        if (this.getType() != null && this.getType().equals("user")) {
+            for (User user : Admin.getUsers()) {
+                for (Playlist playlist : this.getPlaylists()) {
+                    for (Song song : playlist.getSongs()) {
+                        if (user.getPlayer().getCurrentAudioFile() != null && user.getPlayer().getCurrentAudioFile().getName().equals(song.getName()))
+                            return this.getUsername() + " can't be deleted.";
+                    }
+                }
+            }
+        }
+
+        for (User user : Admin.getUsers()) {
+            for (Playlist playlist : this.getPlaylists())
+                user.getFollowedPlaylists().remove(playlist);
+        }
+        Admin.getPlaylists().removeAll(this.getPlaylists());
 
         return message;
+    }
+
+    public String removeAlbum(String username, String albumName) {
+        User artist = Admin.getUser(username);
+        assert artist != null;
+        if (!artist.getType().equals("artist"))
+            return artist.getUsername() + " is not an artist.";
+
+        int ok = 0;
+        for (Album album : artist.getAlbums())
+            if (album.getName().equals(albumName)) {
+                ok = 1;
+                break;
+            }
+
+        if (ok == 0)
+            return artist.getUsername() + " doesn't have an album with the given name.";
+
+        for (User user : Admin.getUsers()) {
+            for (Album album : artist.getAlbums()) {
+                for (Song song : album.getSongs())
+                    if (user.getPlayer().getCurrentAudioFile() != null && song.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
+                        return artist.getUsername() + " can't delete this album.";
+            }
+        }
+
+        return artist.getUsername() + " deleted the album successfully.";
     }
 
     public String addMerch(CommandInput commandInput) {
@@ -585,7 +740,7 @@ public class User extends AudioCollection{
 
         Podcast newPodcast = new Podcast(commandInput.getName(), commandInput.getUsername(), newEpisodes);
 //        if (!Admin.getPodcasts().contains(newPodcast))
-        if (ok == 1)
+        if (ok == 1 && !Admin.getPodcasts().contains(newPodcast))
             Admin.getAdminPodcasts().add(newPodcast);
 
         if (ok == 1)
@@ -609,7 +764,7 @@ public class User extends AudioCollection{
             ok = 1;
         }
         for (User user : Admin.getUsers()) {
-            if (user.getPlayer().getSource() != null && user.getPlayer().getSource().getAudioCollection().getName().equals(commandInput.getName()) && !user.getPlayer().getPaused()) {
+            if (user.getPlayer().getSource() != null && user.getPlayer().getSource().getAudioCollection() != null && user.getPlayer().getSource().getAudioCollection().getName().equals(commandInput.getName()) && !user.getPlayer().getPaused()) {
                 message = commandInput.getUsername() + " can't delete this podcast.";
                 ok = 1;
                 break;
@@ -618,7 +773,7 @@ public class User extends AudioCollection{
         if (ok == 0) {
             for (Podcast podcast : Admin.getPodcasts()) {
                 if (podcast.getName().equals(commandInput.getName()))
-                    Admin.getPodcasts().remove(podcast);
+                    Admin.getPodcastsList().remove(podcast);
             }
         }
         return message;

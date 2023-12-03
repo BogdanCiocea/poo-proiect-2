@@ -183,7 +183,6 @@ public class Admin {
     }
 
     public static List<String> getTop5Albums() {
-        Map<String, Integer> albumLikes = new HashMap<>();
         List<Album> albums1 = new ArrayList<>(getAlbums());
         albums1.sort(Comparator.comparingInt(Album::getTotalLikes).reversed());
         List<String> topAlbums = new ArrayList<>();
@@ -197,6 +196,23 @@ public class Admin {
         Set<String> uniqueAlbums = new LinkedHashSet<>(topAlbums);
         topAlbums = new ArrayList<>(uniqueAlbums);
         return topAlbums;
+    }
+
+    public static List<String> getTop5Artists() {
+
+        List<User> artists = new ArrayList<>(getUsers().stream().filter(user -> (user.getType() != null && user.getType().equals("artist"))).toList());
+        artists.sort(Comparator.comparingInt(User::getNumberOfAlbumLikes).reversed());
+        List<String> topArtists = new ArrayList<>();
+        int count = 0;
+        for (User artist : artists) {
+            if (count >= 5)
+                break;
+            topArtists.add(artist.getUsername());
+            count++;
+        }
+        Set<String> uniqueArtists = new LinkedHashSet<>(topArtists);
+        topArtists = new ArrayList<>(uniqueArtists);
+        return topArtists;
     }
 
     public static List<Song> getSong(String name) {

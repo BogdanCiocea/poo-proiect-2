@@ -26051,4 +26051,8 @@
   "command" : "getTop5Albums",
   "timestamp" : 14849,
   "result" : [ "Heroic Harmonies", "Chill Funeral ", "Heroic Hood", "Electric Harmonies", "Bad Funeral " ]
+}, {
+  "command" : "getTop5Artists",
+  "timestamp" : 14849,
+  "result" : [ "barmstrong", "matthewporter", "amanda16", "cbutler", "jacobdean" ]
 } ]

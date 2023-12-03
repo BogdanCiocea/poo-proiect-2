@@ -281,6 +281,9 @@ public class User extends AudioCollection{
     }
 
     public String shuffle(Integer seed) {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before using the shuffle function.";
 
@@ -295,6 +298,8 @@ public class User extends AudioCollection{
     }
 
     public String forward() {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before attempting to forward.";
 
@@ -335,6 +340,8 @@ public class User extends AudioCollection{
     }
 
     public String backward() {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
         if (player.getCurrentAudioFile() == null)
             return "Please select a source before rewinding.";
 
@@ -347,6 +354,9 @@ public class User extends AudioCollection{
     }
 
     public String like() {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before liking or unliking.";
 
@@ -368,6 +378,9 @@ public class User extends AudioCollection{
     }
 
     public String next() {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before skipping to the next track.";
 
@@ -380,6 +393,9 @@ public class User extends AudioCollection{
     }
 
     public String prev() {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before returning to the previous track.";
 
@@ -389,6 +405,9 @@ public class User extends AudioCollection{
     }
 
     public String createPlaylist(String name, int timestamp) {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (playlists.stream().anyMatch(playlist -> playlist.getName().equals(name)))
             return "A playlist with the same name already exists.";
 
@@ -398,6 +417,9 @@ public class User extends AudioCollection{
     }
 
     public String addRemoveInPlaylist(int Id) {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before adding to or removing from the playlist.";
 
@@ -419,6 +441,9 @@ public class User extends AudioCollection{
     }
 
     public String switchPlaylistVisibility(Integer playlistId) {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         if (playlistId > playlists.size())
             return "The specified playlist ID is too high.";
 
@@ -442,6 +467,9 @@ public class User extends AudioCollection{
     }
 
     public String follow() {
+        if (!this.getOnlineStatus())
+            return this.getUsername() + " is offline.";
+
         LibraryEntry selection = searchBar.getLastSelected();
         String type = searchBar.getLastSearchType();
 
@@ -481,6 +509,18 @@ public class User extends AudioCollection{
         }
 
         return results;
+    }
+
+    public Integer getNumberOfAlbumLikes() {
+        if (!this.getType().equals("artist"))
+            return -1;
+
+        Integer numberOfLikes = 0;
+        for (Album album : this.getAlbums())
+            for (Song song : album.getSongs())
+                numberOfLikes += song.getLikes();
+
+        return numberOfLikes;
     }
 
     public String getPreferredGenre() {

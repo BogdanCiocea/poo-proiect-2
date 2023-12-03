@@ -124,6 +124,7 @@ public final class Main {
                 case "removeAnnouncement" -> outputs.add(CommandRunner.removeAnnouncement(command));
                 case "removeAlbum" -> outputs.add(CommandRunner.removeALbum(command));
                 case "removeEvent" -> outputs.add(CommandRunner.removeEvent(command));
+                case "getTop5Artists" -> outputs.add(CommandRunner.getTop5Artists(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

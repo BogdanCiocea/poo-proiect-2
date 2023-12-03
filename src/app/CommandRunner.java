@@ -470,7 +470,6 @@ public class CommandRunner {
         String message = "mama ta";
         List<Song> likedSongs = new ArrayList<>(user.getLikedSongs());
 
-        // Sort liked songs by the number of likes and limit to top 5
         likedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
         List<Song> topLikedSongs = likedSongs.stream().limit(5).collect(Collectors.toList());
         List<Playlist> followedPlaylists = new ArrayList<>(user.getFollowedPlaylists());
@@ -545,8 +544,10 @@ public class CommandRunner {
                 message = "Podcasts:\n\t" + podcastPrints + "\n\nAnnouncements:\n\t" + announcements;
 
                 user.setLastUserSelected(host.getUsername());
-            } else
+            } else if (user.getLastPageMessage() != null)
                 message = user.getLastPageMessage();
+            else
+                message = "Liked songs:\n\t[]\n\nFollowed playlists:\n\t[]";
         }
         user.setLastPageMessage(message);
         ObjectNode objectNode = objectMapper.createObjectNode();

@@ -309,7 +309,7 @@ public class User extends AudioCollection{
     public String addAnnouncement(String name, String description) {
         String message = this.getUsername() + " has successfully added new announcement.";
 
-        if (this.getType() != null && !this.getType().equals("host"))
+        if (this.getType() == null || !this.getType().equals("host"))
             return this.getUsername() + " is not a host.";
 
         for (Announcement announcement : this.getAnnouncements())
@@ -611,20 +611,24 @@ public class User extends AudioCollection{
 
         if (this.getType() != null && this.getType().equals("host")) {
             for (User user : Admin.getUsers()) {
+                if (user.getCurrentPage().equals("Host"))
+                    return getUsername() + " can't be deleted.";
                 for (Podcast podcast : this.getPodcasts())
                     for (Episode episode : podcast.getEpisodes()) {
-                        if (!this.getUsername().equals(user.getUsername()) && user.getPlayer().getSource() != null && (user.getPlayer().getCurrentAudioFile().getName().equals(episode.getName()) || (user.getSearchBar().getLastSelected() != null && user.getSearchBar().getLastSelected().getName().equals(this.getUsername()))))
+                        if (user.getPlayer().getSource() != null && (user.getPlayer().getCurrentAudioFile().getName().equals(episode.getName())))
                             return getUsername() + " can't be deleted.";
                     }
             }
             Admin.getHosts().remove(this);
             for (Podcast podcast : Admin.getPodcasts())
                 if (podcast.getOwner().equals(this.getUsername()))
-                    Admin.getPodcasts().remove(podcast);
+                    Admin.getPodcastsList().remove(podcast);
         }
 
         if (this.getType() != null && this.getType().equals("artist")) {
             for (User user : Admin.getUsers()) {
+                if (user.getCurrentPage().equals("Artist"))
+                    return getUsername() + " can't be deleted.";
                 for (Album album : this.getAlbums())
                     for (Song song : album.getSongs())
                         if (user.getPlayer().getCurrentAudioFile() != null && user.getPlayer().getCurrentAudioFile().getName().equals(song.getName()))
@@ -656,6 +660,13 @@ public class User extends AudioCollection{
                             return this.getUsername() + " can't be deleted.";
                     }
                 }
+            }
+        }
+
+        for (User user : Admin.getUsers()) {
+            for (Playlist playlist : user.getPlaylists()) {
+                if (this.getFollowedPlaylists().contains(playlist))
+                    playlist.decreaseFollowers();
             }
         }
 
@@ -759,23 +770,23 @@ public class User extends AudioCollection{
                 ok = 1;
             }
         }
+
         if (ok == 0) {
-            message = this.getUsername() + " doesn't have a podcast with the given name.";
-            ok = 1;
+            return this.getUsername() + " doesn't have a podcast with the given name.";
         }
+
         for (User user : Admin.getUsers()) {
             if (user.getPlayer().getSource() != null && user.getPlayer().getSource().getAudioCollection() != null && user.getPlayer().getSource().getAudioCollection().getName().equals(commandInput.getName()) && !user.getPlayer().getPaused()) {
-                message = commandInput.getUsername() + " can't delete this podcast.";
-                ok = 1;
-                break;
+                return commandInput.getUsername() + " can't delete this podcast.";
             }
         }
-        if (ok == 0) {
-            for (Podcast podcast : Admin.getPodcasts()) {
-                if (podcast.getName().equals(commandInput.getName()))
-                    Admin.getPodcastsList().remove(podcast);
-            }
+
+        for (Podcast podcast : Admin.getPodcasts()) {
+            if (podcast.getName().equals(commandInput.getName()))
+                Admin.getPodcastsList().remove(podcast);
         }
+        this.getPodcasts().removeIf(podcast -> podcast.getName().equals(commandInput.getName()));
+
         return message;
     }
 

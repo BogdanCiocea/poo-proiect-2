@@ -213,7 +213,7 @@
   "command" : "deleteUser",
   "user" : "audiosage",
   "timestamp" : 930,
-  "message" : "audiosage was successfully deleted."
+  "message" : "audiosage can't be deleted."
 }, {
   "command" : "changePage",
   "user" : "soundseeker21",
@@ -283,7 +283,7 @@
   "command" : "deleteUser",
   "user" : "sonicpainter",
   "timestamp" : 7860,
-  "message" : "sonicpainter was successfully deleted."
+  "message" : "sonicpainter can't be deleted."
 }, {
   "command" : "changePage",
   "user" : "david27",
@@ -293,7 +293,7 @@
   "command" : "deleteUser",
   "user" : "sonicpainter",
   "timestamp" : 7890,
-  "message" : "The username sonicpainter doesn't exist."
+  "message" : "sonicpainter was successfully deleted."
 }, {
   "command" : "printCurrentPage",
   "user" : "bob35",

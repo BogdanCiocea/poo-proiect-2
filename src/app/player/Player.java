@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Player {
     private Enums.RepeatMode repeatMode;
-    private boolean shuffle;
+    private boolean shuffle = false;
     private boolean paused;
     private PlayerSource source;
     @Getter
@@ -136,7 +136,7 @@ public class Player {
             source.generateShuffleOrder(seed);
         }
 
-        if (source.getType() == Enums.PlayerSourceType.PLAYLIST) {
+        if (source.getType() == Enums.PlayerSourceType.PLAYLIST || source.getType() == Enums.PlayerSourceType.ALBUM) {
             shuffle = !shuffle;
             if (shuffle) {
                 source.updateShuffleIndex();

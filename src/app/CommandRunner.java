@@ -471,13 +471,14 @@ public class CommandRunner {
     public static ObjectNode printCurrentPage(CommandInput commandInput) {
         User user = Admin.getUser(commandInput.getUsername());
         String message = "mama ta";
+        assert user != null;
         List<Song> likedSongs = new ArrayList<>(user.getLikedSongs());
         boolean dewIt = true;
         if (!user.getOnlineStatus())
             dewIt = false;
         if (dewIt) {
             likedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
-            List<Song> topLikedSongs = likedSongs.stream().limit(5).collect(Collectors.toList());
+            List<Song> topLikedSongs = likedSongs.stream().limit(5).toList();
             List<Playlist> followedPlaylists = new ArrayList<>(user.getFollowedPlaylists());
             followedPlaylists.sort(Comparator.comparingInt(Playlist::getFollowers).reversed());
             List<Playlist> topFollowedPlaylists = followedPlaylists.stream().limit(5).collect(Collectors.toList());
@@ -751,7 +752,7 @@ public class CommandRunner {
         objectNode.put("timestamp", commandInput.getTimestamp());
         if (user != null) {
             PlayerStats stats = user.getPlayerStats();
-            if (user.getOnlineStatus() == false)
+            if (!user.getOnlineStatus())
                 stats.setPaused(false);
             objectNode.put("stats", objectMapper.valueToTree(stats));
         }

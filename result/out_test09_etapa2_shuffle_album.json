@@ -179,7 +179,7 @@
   "command" : "shuffle",
   "user" : "bob35",
   "timestamp" : 440,
-  "message" : "The loaded source is not a playlist or an album."
+  "message" : "Shuffle function activated successfully."
 }, {
   "command" : "status",
   "user" : "bob35",
@@ -188,7 +188,7 @@
     "name" : "Vibrant Echoes",
     "remainedTime" : 237,
     "repeat" : "No Repeat",
-    "shuffle" : false,
+    "shuffle" : true,
     "paused" : false
   }
 }, {
@@ -211,10 +211,10 @@
   "user" : "bob35",
   "timestamp" : 1000,
   "stats" : {
-    "name" : "Retro Rhythms",
-    "remainedTime" : 203,
+    "name" : "Digital Dreams",
+    "remainedTime" : 243,
     "repeat" : "No Repeat",
-    "shuffle" : false,
+    "shuffle" : true,
     "paused" : false
   }
 }, {
@@ -380,8 +380,8 @@
   "user" : "bob35",
   "timestamp" : 3250,
   "stats" : {
-    "name" : "Hustle Hard",
-    "remainedTime" : 167,
+    "name" : "Begin Again",
+    "remainedTime" : 173,
     "repeat" : "No Repeat",
     "shuffle" : true,
     "paused" : false
@@ -422,7 +422,7 @@
   "command" : "printCurrentPage",
   "user" : "david27",
   "timestamp" : 3900,
-  "message" : "Albums:\n\t[Harmonic Horizons]\n\nMerch:\n\t[Merch1 - 100:\n\tPrimul Merch adaugat!]\n\nEvents:\n\t[Event2 - 05-02-2021:\n\tAl doilea Event adaugat!]"
+  "message" : "Albums:\n\t[]\n\nMerch:\n\t[Merch1 - 100:\n\tPrimul Merch adaugat!]\n\nEvents:\n\t[Event2 - 05-02-2021:\n\tAl doilea Event adaugat!]"
 }, {
   "command" : "status",
   "user" : "bob35",
@@ -470,14 +470,14 @@
   "command" : "printCurrentPage",
   "user" : "david27",
   "timestamp" : 4400,
-  "message" : "Albums:\n\t[Harmonic Horizons]\n\nMerch:\n\t[Merch1 - 100:\n\tPrimul Merch adaugat!]\n\nEvents:\n\t[Event2 - 05-02-2021:\n\tAl doilea Event adaugat!]"
+  "message" : "Albums:\n\t[]\n\nMerch:\n\t[Merch1 - 100:\n\tPrimul Merch adaugat!]\n\nEvents:\n\t[Event2 - 05-02-2021:\n\tAl doilea Event adaugat!]"
 }, {
   "command" : "status",
   "user" : "bob35",
   "timestamp" : 4410,
   "stats" : {
-    "name" : "Retro Rhythms",
-    "remainedTime" : 163,
+    "name" : "Elevate",
+    "remainedTime" : 168,
     "repeat" : "No Repeat",
     "shuffle" : true,
     "paused" : false
@@ -487,17 +487,17 @@
   "user" : "bob35",
   "timestamp" : 4750,
   "stats" : {
-    "name" : "Hustle Hard",
-    "remainedTime" : 55,
+    "name" : "",
+    "remainedTime" : 0,
     "repeat" : "No Repeat",
-    "shuffle" : true,
-    "paused" : false
+    "shuffle" : false,
+    "paused" : true
   }
 }, {
   "command" : "printCurrentPage",
   "user" : "carol19",
   "timestamp" : 5000,
-  "message" : "Liked songs:\n\t[Digital Dreams - melodymaster]\n\nFollowed playlists:\n\t[My playlist - bob35]"
+  "message" : "Liked songs:\n\t[]\n\nFollowed playlists:\n\t[My playlist - bob35]"
 }, {
   "command" : "status",
   "user" : "bob35",
@@ -515,7 +515,7 @@
   "timestamp" : 6000,
   "result" : [ {
     "name" : "My playlist",
-    "songs" : [ "Retro Rhythms", "Elevate", "I Don't Wanna Live Forever", "Hustle Hard", "Begin Again" ],
+    "songs" : [ "Elevate", "I Don't Wanna Live Forever", "Hustle Hard", "Begin Again" ],
     "visibility" : "public",
     "followers" : 1
   } ]

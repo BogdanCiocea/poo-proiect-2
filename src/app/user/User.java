@@ -109,10 +109,10 @@ public class User extends AudioCollection{
     private final ArrayList<Album> albums = new ArrayList<>();
 
     public Album getAlbum(String albumName) {
-            for (Album album : albums) {
-                if (album.getName().equals(albumName))
-                    return album;
-            }
+        for (Album album : this.getAlbums()) {
+            if (album.getName().equals(albumName))
+                return album;
+        }
         return null;
     }
 
@@ -287,7 +287,7 @@ public class User extends AudioCollection{
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before using the shuffle function.";
 
-        if (!player.getType().equals("playlist"))
+        if (!player.getType().equals("playlist") && !player.getType().equals("album"))
             return "The loaded source is not a playlist or an album.";
 
         player.shuffle(seed);
@@ -719,6 +719,13 @@ public class User extends AudioCollection{
         return message;
     }
 
+    public Playlist getPlaylist(String playlistName) {
+        for (Playlist playlist : this.getPlaylists())
+            if (playlist.getName().equals(playlistName))
+                return playlist;
+        return null;
+    }
+
     public String removeAlbum(String username, String albumName) {
         User artist = Admin.getUser(username);
         assert artist != null;
@@ -742,6 +749,16 @@ public class User extends AudioCollection{
                         return artist.getUsername() + " can't delete this album.";
             }
         }
+
+        for (User user : Admin.getUsers())
+            user.getLikedSongs().removeIf(song1 -> song1.matchesAlbum(albumName));
+
+        for (User user : Admin.getUsers())
+            for (Playlist playlist : user.getPlaylists())
+                user.getPlaylist(playlist.getName()).getSongs().removeIf(song -> song.getAlbum().equals(albumName));
+
+        Admin.getAlbums().remove(artist.getAlbum(albumName));
+        artist.getAlbums().remove(artist.getAlbum(albumName));
 
         return artist.getUsername() + " deleted the album successfully.";
     }

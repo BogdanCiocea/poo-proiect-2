@@ -742,11 +742,20 @@ public class User extends AudioCollection{
         if (ok == 0)
             return artist.getUsername() + " doesn't have an album with the given name.";
 
+//        for (User user : Admin.getUsers()) {
+//            for (Album album : artist.getAlbums()) {
+//                for (Song song : album.getSongs())
+//                    if (user.getPlayer().getCurrentAudioFile() != null && song.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
+//                        return artist.getUsername() + " can't delete this album.";
+//            }
+//        }
+
         for (User user : Admin.getUsers()) {
-            for (Album album : artist.getAlbums()) {
-                for (Song song : album.getSongs())
-                    if (user.getPlayer().getCurrentAudioFile() != null && song.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
-                        return artist.getUsername() + " can't delete this album.";
+            for (Playlist playlist : user.getPlaylists()) {
+                for (Song song : artist.getAlbum(albumName).getSongs())
+                    for (Song song1 : playlist.getSongs())
+                        if (song1.getName().equals(song.getName()))
+                            return artist.getUsername() + " can't delete this album.";
             }
         }
 

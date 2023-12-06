@@ -54,6 +54,10 @@ public class User extends AudioCollection{
     private String lastPageMessage;
     private String lastUserSelected;
 
+    public void setOnlineStatus(boolean onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
+
     public String getLastUserSelected() {
         return lastUserSelected;
     }
@@ -141,6 +145,8 @@ public class User extends AudioCollection{
     }
 
     public String switchConnectionStatus() {
+        if (this.getType() != null && (this.getType().equals("artist") || this.getType().equals("host")))
+            return this.getUsername() + " is not a normal user.";
         onlineStatus = !onlineStatus;
         player.pause();
         return username + " has changed status successfully.";
@@ -205,11 +211,6 @@ public class User extends AudioCollection{
 
         for (LibraryEntry libraryEntry : libraryEntries) {
             results.add(libraryEntry.getName());
-        }
-
-        if (type.equals("artist") || type.equals("host")) {
-            Set<String> uniqueResults = new LinkedHashSet<>(results);
-            results = new ArrayList<>(uniqueResults);
         }
 
         return results;
@@ -360,7 +361,7 @@ public class User extends AudioCollection{
         if (player.getCurrentAudioFile() == null)
             return "Please load a source before liking or unliking.";
 
-        if (!player.getType().equals("song") && !player.getType().equals("playlist"))
+        if (!player.getType().equals("song") && !player.getType().equals("playlist") && !player.getType().equals("album"))
             return "Loaded source is not a song.";
 
         Song song = (Song) player.getCurrentAudioFile();
@@ -592,7 +593,6 @@ public class User extends AudioCollection{
 
         return commandInput.getUsername() + " has added new album successfully.";
     }
-
 
     public String addEvent(CommandInput commandInput) {
         if (this.getType() == null || !getType().equals("artist")) {

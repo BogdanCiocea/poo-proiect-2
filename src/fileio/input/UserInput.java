@@ -5,6 +5,16 @@ public final class UserInput {
     private int age;
     private String city;
 
+    private boolean onlineStatus = true;
+
+    public boolean isOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(boolean onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
+
     public UserInput() {
     }
 

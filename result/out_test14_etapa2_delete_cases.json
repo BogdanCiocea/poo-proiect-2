@@ -157,8 +157,8 @@
   "timestamp" : 480,
   "message" : "Repeat mode changed to repeat once."
 }, {
-  "command" : "printCurrentPage",
   "user" : "bob35",
+  "command" : "printCurrentPage",
   "timestamp" : 525,
   "message" : "Liked songs:\n\t[Aurora Harmony]\n\nFollowed playlists:\n\t[Playlist bengos]"
 }, {
@@ -295,8 +295,8 @@
   "timestamp" : 7890,
   "message" : "sonicpainter was successfully deleted."
 }, {
-  "command" : "printCurrentPage",
   "user" : "bob35",
+  "command" : "printCurrentPage",
   "timestamp" : 7900,
   "message" : "Liked songs:\n\t[]\n\nFollowed playlists:\n\t[]"
 } ]

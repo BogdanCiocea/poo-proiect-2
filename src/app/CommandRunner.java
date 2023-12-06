@@ -37,12 +37,8 @@ public class CommandRunner {
             results = user.search(filters, type);
             if (type.equals("artist")) {
                 user.setCurrentPage("Artist");
-                Set<String> uniqueResults = new LinkedHashSet<>(results);
-                results = new ArrayList<>(uniqueResults);
             } else if (type.equals("host")) {
                 user.setCurrentPage("Host");
-                Set<String> uniqueResults = new LinkedHashSet<>(results);
-                results = new ArrayList<>(uniqueResults);
             }
             message = "Search returned " + results.size() + " results";
         } else {
@@ -63,8 +59,12 @@ public class CommandRunner {
         User user = Admin.getUser(commandInput.getUsername());
         String message;
 
-        if (Admin.getUser(commandInput.getUsername()) != null)
+        if (Admin.getUser(commandInput.getUsername()) != null) {
+            assert user != null;
             message = user.switchConnectionStatus();
+            if (user.getType() != null && (user.getType().equals("artist") || user.getType().equals("host")))
+                user.getPlayer().setPaused(true);
+        }
         else
             message = "The username " + commandInput.getUsername() + " doesn't exist.";
 
@@ -87,13 +87,17 @@ public class CommandRunner {
             newUser = new User(commandInput.getUsername(), commandInput.getAge(), commandInput.getCity());
             newUser.setType(commandInput.getType());
             if (newUser.getType().equals("artist")) {
-                newUser.switchConnectionStatus();
+                //newUser.switchConnectionStatus();
+                newUser.setOnlineStatus(false);
+                //newUser.getPlayer().setPaused(true);
                 Admin.getArtists().add(newUser);
                 ArtistHelper artistHelper = new ArtistHelper(newUser.getUsername(), newUser.getAlbums());
                 Admin.getArtistHelpers().add(artistHelper);
             } else if (newUser.getType().equals("host")) {
                 if (Admin.getHosts().isEmpty())
                     Admin.getHostHelpers().clear();
+                newUser.setOnlineStatus(false);
+                //newUser.getPlayer().setPaused(true);
                 Admin.getHosts().add(newUser);
                 HostHelper hostHelper = new HostHelper(newUser.getUsername(), newUser.getPodcasts());
                 Admin.getHostHelpers().add(hostHelper);
@@ -430,9 +434,7 @@ public class CommandRunner {
         else
             message = user.addAlbum(commandInput);
 
-        Set<Song> correctSongList = new LinkedHashSet<>(Admin.getSongs());
-        List<Song> newListSong = new ArrayList<>(correctSongList);
-        Admin.setSongsNew(newListSong);
+        Admin.setSongsNew(Admin.getSongs());
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
@@ -510,7 +512,14 @@ public class CommandRunner {
 
                 message = "Liked songs:\n\t[" + formattedTopSongs + "]\n\nFollowed playlists:\n\t[" + formattedTopPlaylists + "]";
             } else if (user.getCurrentPage().equals("LikedContent")) {
-                message = "Liked songs:\n\t" + likedPageSongs + "\n\nFollowed playlists:\n\t" + likedPagePlaylists;
+                List<Song> likedS0ngs = user.getLikedSongs();
+                //likedS0ngs.sort(Comparator.comparingInt(Song::getLikes).reversed());
+
+                List<String> likedSongsString = new ArrayList<>();
+                for (Song song : likedS0ngs)
+                    likedSongsString.add(song.getName() + " - " + song.getArtist());
+                //Collections.sort(likedSongsString);
+                message = "Liked songs:\n\t" + likedSongsString + "\n\nFollowed playlists:\n\t" + likedPagePlaylists;
             } else if (user.getCurrentPage().equals("Artist") && user.getSearchBar().getLastSelected() != null) {
                 User artist = Admin.getUser(user.getSearchBar().getLastSelected().getName());
                 List<String> albums = new ArrayList<>();
@@ -560,9 +569,12 @@ public class CommandRunner {
         } else
             message = user.getUsername() + " is offline.";
 
+        if (message.equals("mama ta"))
+            message = user.getLastPageMessage();
+
         ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
+        objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("message", message);
 
@@ -754,6 +766,7 @@ public class CommandRunner {
             PlayerStats stats = user.getPlayerStats();
             if (!user.getOnlineStatus())
                 stats.setPaused(false);
+
             objectNode.put("stats", objectMapper.valueToTree(stats));
         }
         return objectNode;

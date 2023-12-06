@@ -147,8 +147,9 @@ public class User extends AudioCollection{
     public String switchConnectionStatus() {
         if (this.getType() != null && (this.getType().equals("artist") || this.getType().equals("host")))
             return this.getUsername() + " is not a normal user.";
-        onlineStatus = !onlineStatus;
+//        if (onlineStatus)
         player.pause();
+        onlineStatus = !onlineStatus;
         return username + " has changed status successfully.";
     }
 
@@ -742,13 +743,13 @@ public class User extends AudioCollection{
         if (ok == 0)
             return artist.getUsername() + " doesn't have an album with the given name.";
 
-//        for (User user : Admin.getUsers()) {
-//            for (Album album : artist.getAlbums()) {
-//                for (Song song : album.getSongs())
-//                    if (user.getPlayer().getCurrentAudioFile() != null && song.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
-//                        return artist.getUsername() + " can't delete this album.";
-//            }
-//        }
+        for (User user : Admin.getUsers()) {
+            for (Album album : artist.getAlbums()) {
+                for (Song song : album.getSongs())
+                    if (user.getPlayer().getCurrentAudioFile() != null && song.getName().equals(user.getPlayer().getCurrentAudioFile().getName()))
+                        return artist.getUsername() + " can't delete this album.";
+            }
+        }
 
         for (User user : Admin.getUsers()) {
             for (Playlist playlist : user.getPlaylists()) {

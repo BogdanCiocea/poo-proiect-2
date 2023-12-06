@@ -62,8 +62,8 @@ public class CommandRunner {
         if (Admin.getUser(commandInput.getUsername()) != null) {
             assert user != null;
             message = user.switchConnectionStatus();
-            if (user.getType() != null && (user.getType().equals("artist") || user.getType().equals("host")))
-                user.getPlayer().setPaused(true);
+//            if (user.getType() != null && (user.getType().equals("artist") || user.getType().equals("host")))
+                //user.getPlayer().setPaused(true);
         }
         else
             message = "The username " + commandInput.getUsername() + " doesn't exist.";

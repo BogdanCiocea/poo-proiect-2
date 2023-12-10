@@ -14,65 +14,94 @@ public class Player {
     private boolean shuffle = false;
     private boolean paused;
     private PlayerSource source;
+    public static final int SKIP_TIME = 90;
     @Getter
     private String type;
-
+    /**
+     * @return the repeatMode
+     */
     public Enums.RepeatMode getRepeatMode() {
         return repeatMode;
     }
-
-    public void setRepeatMode(Enums.RepeatMode repeatMode) {
+    /**
+     * @param repeatMode the repeatMode to set
+     */
+    public void setRepeatMode(final Enums.RepeatMode repeatMode) {
         this.repeatMode = repeatMode;
     }
-
+    /**
+     * @return the shuffle
+     */
     public boolean isShuffle() {
         return shuffle;
     }
-
-    public void setShuffle(boolean shuffle) {
+    /**
+     * @param shuffle the shuffle to set
+     */
+    public void setShuffle(final boolean shuffle) {
         this.shuffle = shuffle;
     }
-
+    /**
+     * @return the paused
+     */
     public boolean isPaused() {
         return paused;
     }
-
-    public void setPaused(boolean paused) {
+    /**
+     * @param paused the paused to set
+     */
+    public void setPaused(final boolean paused) {
         this.paused = paused;
     }
-
+    /**
+     * @return the source
+     */
     public PlayerSource getSource() {
         return source;
     }
-
-    public void setSource(PlayerSource source) {
+    /**
+     * @param source the source to set
+     */
+    public void setSource(final PlayerSource source) {
         this.source = source;
     }
-
+    /**
+     * @return the type
+     */
     public String getType() {
         return type;
     }
-
-    public void setType(String type) {
+    /**
+     * @param type the type to set
+     */
+    public void setType(final String type) {
         this.type = type;
     }
-
+    /**
+     * @return the bookmarks
+     */
     public ArrayList<PodcastBookmark> getBookmarks() {
         return bookmarks;
     }
-
-    public void setBookmarks(ArrayList<PodcastBookmark> bookmarks) {
+    /**
+     * @param bookmarks the bookmarks to set
+     */
+    public void setBookmarks(final ArrayList<PodcastBookmark> bookmarks) {
         this.bookmarks = bookmarks;
     }
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
-
+    /**
+     * Constructor for the player.
+     */
     public Player() {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.paused = true;
     }
-
+    /**
+     * Stops the player.
+     */
     public void stop() {
         if ("podcast".equals(this.type)) {
             bookmarkPodcast();
@@ -84,15 +113,27 @@ public class Player {
         shuffle = false;
     }
 
+    /**
+     * Bookmarks the current podcast.
+     */
     private void bookmarkPodcast() {
         if (source != null && source.getAudioFile() != null) {
-            PodcastBookmark currentBookmark = new PodcastBookmark(source.getAudioCollection().getName(), source.getIndex(), source.getDuration());
+            PodcastBookmark currentBookmark = new
+                    PodcastBookmark(source.getAudioCollection().getName(),
+                    source.getIndex(), source.getDuration());
             bookmarks.removeIf(bookmark -> bookmark.getName().equals(currentBookmark.getName()));
             bookmarks.add(currentBookmark);
         }
     }
-
-    public static PlayerSource createSource(String type, LibraryEntry entry, List<PodcastBookmark> bookmarks) {
+    /**
+     * Creates a source for the player.
+     * @param type type
+     * @param entry entry
+     * @param bookmarks bookmarks
+     * @return source
+     */
+    public static PlayerSource createSource(final String type, final LibraryEntry entry,
+                                            final List<PodcastBookmark> bookmarks) {
         if ("song".equals(type)) {
             return new PlayerSource(Enums.PlayerSourceType.LIBRARY, (AudioFile) entry);
         } else if ("playlist".equals(type)) {
@@ -106,7 +147,14 @@ public class Player {
         return null;
     }
 
-    private static PlayerSource createPodcastSource(AudioCollection collection, List<PodcastBookmark> bookmarks) {
+    /**
+     * Creates a podcast source for the player.
+     * @param collection collection
+     * @param bookmarks bookmarks
+     * @return source
+     */
+    private static PlayerSource createPodcastSource(final AudioCollection collection,
+                                                    final List<PodcastBookmark> bookmarks) {
         for (PodcastBookmark bookmark : bookmarks) {
             if (bookmark.getName().equals(collection.getName())) {
                 return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection, bookmark);
@@ -114,8 +162,12 @@ public class Player {
         }
         return new PlayerSource(Enums.PlayerSourceType.PODCAST, collection);
     }
-
-    public void setSource(LibraryEntry entry, String type) {
+    /**
+     * Sets the source for the player.
+     * @param entry entry
+     * @param type type
+     */
+    public void setSource(final LibraryEntry entry, final String type) {
         if ("podcast".equals(this.type)) {
             bookmarkPodcast();
         }
@@ -127,23 +179,33 @@ public class Player {
         this.paused = true;
     }
 
+    /**
+     * Plays / pauses the current audio file.
+     */
     public void pause() {
         paused = !paused;
     }
-
-    public void shuffle (Integer seed) {
+    /**
+     * Shuffles the current audio file.
+     * @param seed seed
+     */
+    public void shuffle(final Integer seed) {
         if (seed != null) {
             source.generateShuffleOrder(seed);
         }
 
-        if (source.getType() == Enums.PlayerSourceType.PLAYLIST || source.getType() == Enums.PlayerSourceType.ALBUM) {
+        if (source.getType() == Enums.PlayerSourceType.PLAYLIST
+                || source.getType() == Enums.PlayerSourceType.ALBUM) {
             shuffle = !shuffle;
             if (shuffle) {
                 source.updateShuffleIndex();
             }
         }
     }
-
+    /**
+     * Repeats the current audio file.
+     * @return repeatMode
+     */
     public Enums.RepeatMode repeat() {
         if (repeatMode == Enums.RepeatMode.NO_REPEAT) {
             if (source.getType() == Enums.PlayerSourceType.LIBRARY) {
@@ -165,7 +227,10 @@ public class Player {
 
         return repeatMode;
     }
-
+    /**
+     * Simulates the player.
+     * @param time time
+     */
     public void simulatePlayer(int time) {
         if (!paused && this.source != null) {
             while (time >= source.getDuration()) {
@@ -180,7 +245,9 @@ public class Player {
             }
         }
     }
-
+    /**
+     * Plays the next audio file.
+     */
     public void next() {
         paused = source.setNextAudioFile(repeatMode, shuffle);
         if (repeatMode == Enums.RepeatMode.REPEAT_ONCE) {
@@ -191,43 +258,67 @@ public class Player {
             stop();
         }
     }
-
+    /**
+     * Plays the previous audio file.
+     */
     public void prev() {
         source.setPrevAudioFile(shuffle);
         paused = false;
     }
-
-    private void skip(int duration) {
+    /**
+     * Skips the current audio file.
+     * @param duration duration
+     */
+    private void skip(final int duration) {
         source.skip(duration);
         paused = false;
     }
-
+    /**
+     * Skips the next audio file.
+     */
     public void skipNext() {
         if (source.getType() == Enums.PlayerSourceType.PODCAST) {
-            skip(-90);
+            skip(-SKIP_TIME);
         }
     }
-
+    /**
+     * Skips the previous audio file.
+     */
     public void skipPrev() {
         if (source.getType() == Enums.PlayerSourceType.PODCAST) {
-            skip(90);
+            skip(SKIP_TIME);
         }
     }
-
+    /**
+     * Gets the current audio file.
+     * @return current audio file
+     */
     public AudioFile getCurrentAudioFile() {
-        if (source == null)
+        if (source == null) {
             return null;
+        }
         return source.getAudioFile();
     }
 
+    /**
+     * Gets the paused state.
+     * @return paused state
+     */
     public boolean getPaused() {
         return paused;
     }
-
+    /**
+     * Gets the shuffle state.
+     * @return shuffle state
+     */
     public boolean getShuffle() {
         return shuffle;
     }
 
+    /**
+     * Gets the stats of the player.
+     * @return stats
+     */
     public PlayerStats getStats() {
         String filename = "";
         int duration = 0;

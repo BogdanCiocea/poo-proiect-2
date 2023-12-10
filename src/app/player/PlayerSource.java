@@ -22,42 +22,72 @@ public class PlayerSource {
     private int indexShuffled;
     private int remainedDuration;
     private final List<Integer> indices = new ArrayList<>();
-
+    /**
+     * Getter for a type.
+     * @return type
+     */
     public Enums.PlayerSourceType getType() {
         return type;
     }
-
+    /**
+     * Getter for audioCollection.
+     * @return audioCollection
+     */
     public AudioCollection getAudioCollection() {
         return audioCollection;
     }
-
+    /**
+     * Getter for audioFile.
+     * @return audioFile
+     */
     public AudioFile getAudioFile() {
         return audioFile;
     }
-
+    /**
+     * Getter for index.
+     * @return index
+     */
     public int getIndex() {
         return index;
     }
-
+    /**
+     * Getter for indexShuffled.
+     * @return indexShuffled
+     */
     public int getIndexShuffled() {
         return indexShuffled;
     }
-
+    /**
+     * Getter for remainedDuration.
+     * @return remainedDuration
+     */
     public int getRemainedDuration() {
         return remainedDuration;
     }
-
+    /**
+     * Getter for indices.
+     * @return indices
+     */
     public List<Integer> getIndices() {
         return indices;
     }
 
-    public PlayerSource(Enums.PlayerSourceType type, AudioFile audioFile) {
+    /**
+     * Constructor for PlayerSource
+     * @param type type
+     * @param audioFile audioFile
+     */
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioFile audioFile) {
         this.type = type;
         this.audioFile = audioFile;
         this.remainedDuration = audioFile.getDuration();
     }
-
-    public PlayerSource(Enums.PlayerSourceType type, AudioCollection audioCollection) {
+    /**
+     * Constructor for PlayerSource
+     * @param type type
+     * @param audioCollection audioCollection
+     */
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioCollection audioCollection) {
         this.type = type;
         this.audioCollection = audioCollection;
         this.audioFile = audioCollection.getTrackByIndex(0);
@@ -66,7 +96,14 @@ public class PlayerSource {
         this.remainedDuration = audioFile.getDuration();
     }
 
-    public PlayerSource(Enums.PlayerSourceType type, AudioCollection audioCollection, PodcastBookmark bookmark) {
+    /**
+     * Constructor for PlayerSource
+     * @param type type
+     * @param audioCollection audioCollection
+     * @param bookmark bookmark
+     */
+    public PlayerSource(final Enums.PlayerSourceType type, final AudioCollection audioCollection,
+                        final PodcastBookmark bookmark) {
         this.type = type;
         this.audioCollection = audioCollection;
         this.index = bookmark.getId();
@@ -74,11 +111,21 @@ public class PlayerSource {
         this.audioFile = audioCollection.getTrackByIndex(index);
     }
 
+    /**
+     * Returns the duration of the current audio file
+     * @return duration
+     */
     public int getDuration() {
         return remainedDuration;
     }
 
-    public boolean setNextAudioFile(Enums.RepeatMode repeatMode, boolean shuffle) {
+    /**
+     * Sets the next audio file
+     * @param repeatMode repeatMode
+     * @param shuffle shuffle
+     * @return true if the player is paused
+     */
+    public boolean setNextAudioFile(final Enums.RepeatMode repeatMode, final boolean shuffle) {
         boolean isPaused = false;
 
         if (type == Enums.PlayerSourceType.LIBRARY) {
@@ -89,7 +136,9 @@ public class PlayerSource {
                 isPaused = true;
             }
         } else {
-            if (repeatMode == Enums.RepeatMode.REPEAT_ONCE || repeatMode == Enums.RepeatMode.REPEAT_CURRENT_SONG || repeatMode == Enums.RepeatMode.REPEAT_INFINITE) {
+            if (repeatMode == Enums.RepeatMode.REPEAT_ONCE
+                    || repeatMode == Enums.RepeatMode.REPEAT_CURRENT_SONG
+                    || repeatMode == Enums.RepeatMode.REPEAT_INFINITE) {
                 remainedDuration = audioFile.getDuration();
             } else if (repeatMode == Enums.RepeatMode.NO_REPEAT) {
                 if (shuffle) {
@@ -128,7 +177,11 @@ public class PlayerSource {
         return isPaused;
     }
 
-    public void setPrevAudioFile(boolean shuffle) {
+    /**
+     * Sets the previous audio file
+     * @param shuffle shuffle
+     */
+    public void setPrevAudioFile(final boolean shuffle) {
         if (type == Enums.PlayerSourceType.LIBRARY) {
             remainedDuration = audioFile.getDuration();
         } else {
@@ -153,7 +206,11 @@ public class PlayerSource {
         }
     }
 
-    public void generateShuffleOrder(Integer seed) {
+    /**
+     * Generates a shuffle order
+     * @param seed seed
+     */
+    public void generateShuffleOrder(final Integer seed) {
         indices.clear();
         Random random = new Random(seed);
         for (int i = 0; i < audioCollection.getNumberOfTracks(); i++) {
@@ -162,6 +219,9 @@ public class PlayerSource {
         Collections.shuffle(indices, random);
     }
 
+    /**
+     * Updates the shuffle index
+     */
     public void updateShuffleIndex() {
         for (int i = 0; i < indices.size(); i++) {
             if (indices.get(i) == index) {
@@ -170,8 +230,11 @@ public class PlayerSource {
             }
         }
     }
-
-    public void skip(int duration) {
+    /**
+     * Skips the current audio file
+     * @param duration duration
+     */
+    public void skip(final int duration) {
         remainedDuration += duration;
         if (remainedDuration > audioFile.getDuration()) {
             remainedDuration = 0;
@@ -182,12 +245,19 @@ public class PlayerSource {
         }
     }
 
+    /**
+     * Updates the audio file
+     */
     private void updateAudioFile() {
-        setAudioFile(audioCollection.getTrackByIndex(index));
+        if (this.audioCollection != null) {
+            setAudioFile(audioCollection.getTrackByIndex(index));
+        }
     }
-
-    public void setAudioFile(AudioFile audioFile) {
+    /**
+     * Sets the audio file
+     * @param audioFile audioFile
+     */
+    public void setAudioFile(final AudioFile audioFile) {
         this.audioFile = audioFile;
     }
-
 }

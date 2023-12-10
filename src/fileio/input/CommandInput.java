@@ -1,10 +1,6 @@
 package fileio.input;
 
-import app.audio.Files.Episode;
-import app.audio.Files.Song;
-
 import java.util.ArrayList;
-import java.util.List;
 
 public final class CommandInput {
     private String command;
@@ -25,145 +21,247 @@ public final class CommandInput {
     private Integer price;
     private String nextPage;
 
+    /**
+     * Gets the next page
+     * @return nextPage
+     */
     public String getNextPage() {
         return nextPage;
     }
 
+    /**
+     * Gets the price
+     * @return price
+     */
     public Integer getPrice() {
         return price;
     }
 
+    /**
+     * Gets the songs
+     * @return songs
+     */
     public ArrayList<SongInput> getSongs() {
         return songs;
     }
+    /**
+     * Gets the date
+     * @return date
+     */
     public String getDate() {
         return date;
     }
     private ArrayList<EpisodeInput> episodes;
-
+    /**
+     * Gets the episodes
+     * @return episodes
+     */
     public ArrayList<EpisodeInput> getEpisodes() {
         return episodes;
     }
-
+    /**
+     * Gets the description
+     * @return description
+     */
     public String getDescription() {
         return description;
     }
-
+    /**
+     * Gets the release year
+     * @return releaseYear
+     */
     public Integer getReleaseYear() {
         return releaseYear;
     }
-
+    /**
+     * Gets the name
+     * @return name
+     */
     public String getName() {
         return name;
     }
-
     private Integer age;
 
     private String city;
-
+    /**
+     * Gets the city
+     * @return city
+     */
     public String getCity() {
         return city;
     }
-
+    /**
+     * Gets the age
+     * @return age
+     */
     public Integer getAge() {
         return age;
     }
 
+    /**
+     * Constructor
+     */
     public CommandInput() {
     }
+    /**
+     * Gets the type
+     * @return type
+     */
     public String getType() {
         return type;
     }
-
-    public void setType(String type) {
+    /**
+     * Sets the type
+     * @param type type
+     */
+    public void setType(final String type) {
         this.type = type;
     }
 
+    /**
+     * Gets the command
+     * @return command
+     */
     public String getCommand() {
         return command;
     }
-
-    public void setCommand(String command) {
+    /**
+     * Sets the command
+     * @param command command
+     */
+    public void setCommand(final String command) {
         this.command = command;
     }
-
+    /**
+     * Gets the username
+     * @return username
+     */
     public String getUsername() {
         return username;
     }
-
-    public void setUsername(String username) {
+    /**
+     * Sets the username
+     * @param username username
+     */
+    public void setUsername(final String username) {
         this.username = username;
     }
-
+    /**
+     * Gets the timestamp
+     * @return timestamp
+     */
     public Integer getTimestamp() {
         return timestamp;
     }
-
-    public void setTimestamp(Integer timestamp) {
+    /**
+     * Sets the timestamp
+     * @param timestamp timestamp
+     */
+    public void setTimestamp(final Integer timestamp) {
         this.timestamp = timestamp;
     }
-
+    /**
+     * Gets the filters
+     * @return filters
+     */
     public FiltersInput getFilters() {
         return filters;
     }
-
-    public void setFilters(FiltersInput filters) {
+    /**
+     * Sets the filters
+     * @param filters filters
+     */
+    public void setFilters(final FiltersInput filters) {
         this.filters = filters;
     }
-
+    /**
+     * Gets the item number
+     * @return itemNumber
+     */
     public Integer getItemNumber() {
         return itemNumber;
     }
-
-    public void setItemNumber(Integer itemNumber) {
+    /**
+     * Sets the item number
+     * @param itemNumber itemNumber
+     */
+    public void setItemNumber(final Integer itemNumber) {
         this.itemNumber = itemNumber;
     }
-
+    /**
+     * Gets the repeat mode
+     * @return repeatMode
+     */
     public Integer getRepeatMode() {
         return repeatMode;
     }
-
-    public void setRepeatMode(Integer repeatMode) {
+    /**
+     * Sets the repeat mode
+     * @param repeatMode repeatMode
+     */
+    public void setRepeatMode(final Integer repeatMode) {
         this.repeatMode = repeatMode;
     }
-
+    /**
+     * Gets the playlist id
+     * @return playlistId
+     */
     public Integer getPlaylistId() {
         return playlistId;
     }
-
-    public void setPlaylistId(Integer playlistId) {
+    /**
+     * Sets the playlist id
+     * @param playlistId playlistId
+     */
+    public void setPlaylistId(final Integer playlistId) {
         this.playlistId = playlistId;
     }
-
+    /**
+     * Gets the playlist name
+     * @return playlistName
+     */
     public String getPlaylistName() {
         return playlistName;
     }
-
-    public void setPlaylistName(String playlistName) {
+    /**
+     * Sets the playlist name
+     * @param playlistName playlistName
+     */
+    public void setPlaylistName(final String playlistName) {
         this.playlistName = playlistName;
     }
-
+    /**
+     * Gets the seed
+     * @return seed
+     */
     public Integer getSeed() {
         return seed;
     }
-
-    public void setSeed(Integer seed) {
+    /**
+     * Sets the seed
+     * @param seed seed
+     */
+    public void setSeed(final Integer seed) {
         this.seed = seed;
     }
 
+    /**
+     * toString method
+     * @return string
+     */
     @Override
     public String toString() {
-        return "CommandInput{" +
-                "command='" + command + '\'' +
-                ", username='" + username + '\'' +
-                ", timestamp=" + timestamp +
-                ", type='" + type + '\'' +
-                ", filters=" + filters +
-                ", itemNumber=" + itemNumber +
-                ", repeatMode=" + repeatMode +
-                ", playlistId=" + playlistId +
-                ", playlistName='" + playlistName + '\'' +
-                ", seed=" + seed +
-                '}';
+        return "CommandInput{"
+                + "command='" + command + '\''
+                + ", username='" + username
+                + '\'' + ", timestamp="
+                + timestamp + ", type='"
+                + type + '\'' + ", filters="
+                + filters + ", itemNumber="
+                + itemNumber + ", repeatMode="
+                + repeatMode + ", playlistId="
+                + playlistId + ", playlistName='"
+                + playlistName + '\'' + ", seed="
+                + seed + '}';
     }
 }

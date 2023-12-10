@@ -10,7 +10,7 @@ public final class Episode extends AudioFile {
         return description;
     }
 
-    public Episode(String name, Integer duration, String description) {
+    public Episode(final String name, final Integer duration, final String description) {
         super(name, duration);
         this.description = description;
     }

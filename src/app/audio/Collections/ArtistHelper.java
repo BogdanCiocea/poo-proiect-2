@@ -1,14 +1,16 @@
 package app.audio.Collections;
 
-import app.audio.Files.AudioFile;
-import app.audio.Files.Song;
 import app.audio.LibraryEntry;
 
 import java.util.List;
 
 public class ArtistHelper extends LibraryEntry {
-
-    public ArtistHelper(String name, List<Album> albums) {
+    /**
+     * Constructor for ArtistHelper.
+     * @param name name
+     * @param albums albums
+     */
+    public ArtistHelper(final String name, final List<Album> albums) {
         super(name);
         this.albums = albums;
         this.name = name;
@@ -16,18 +18,32 @@ public class ArtistHelper extends LibraryEntry {
 
     private List<Album> albums;
     private String name;
-    public void setAlbums(List<Album> albums) {
+    /**
+     * Setter for albums.
+     * @param albums albums
+     */
+    public void setAlbums(final List<Album> albums) {
         this.albums = albums;
     }
 
-    public void setName(String name) {
+    /**
+     * Setter for name.
+     * @param name name
+     */
+    public void setName(final String name) {
         this.name = name;
     }
-
+    /**
+     * Getter for albums.
+     * @return albums
+     */
     public List<Album> getAlbums() {
         return albums;
     }
-
+    /**
+     * Getter for name.
+     * @return name
+     */
     @Override
     public String getName() {
         return name;

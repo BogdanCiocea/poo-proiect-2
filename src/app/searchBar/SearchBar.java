@@ -10,8 +10,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static app.searchBar.FilterUtils.*;
+import static app.searchBar.FilterUtils.filterByAlbum;
+import static app.searchBar.FilterUtils.filterByArtist;
+import static app.searchBar.FilterUtils.filterByDescription;
 import static app.searchBar.FilterUtils.filterByFollowers;
+import static app.searchBar.FilterUtils.filterByGenre;
+import static app.searchBar.FilterUtils.filterByLyrics;
+import static app.searchBar.FilterUtils.filterByName;
+import static app.searchBar.FilterUtils.filterByOwner;
+import static app.searchBar.FilterUtils.filterByPlaylistVisibility;
+import static app.searchBar.FilterUtils.filterByReleaseYear;
+import static app.searchBar.FilterUtils.filterByTags;
 
 public class SearchBar {
     private List<LibraryEntry> results;
@@ -22,45 +31,86 @@ public class SearchBar {
 
     @Getter
     private LibraryEntry lastSelected;
-
+    /**
+     * Gets the results of the search
+     * @return results
+     */
     public List<LibraryEntry> getResults() {
         return results;
     }
 
-    public void setResults(List<LibraryEntry> results) {
+    /**
+     * Sets the results of the search
+     * @param results results
+     */
+    public void setResults(final List<LibraryEntry> results) {
         this.results = results;
     }
 
+    /**
+     * Gets the user.
+     * @return user
+     */
     public String getUser() {
         return user;
     }
 
+    /**
+     * Gets the last search type.
+     * @return last search type
+     */
     public String getLastSearchType() {
         return lastSearchType;
     }
 
-    public void setLastSearchType(String lastSearchType) {
+    /**
+     * Sets the last search type.
+     * @param lastSearchType last search type
+     */
+    public void setLastSearchType(final String lastSearchType) {
         this.lastSearchType = lastSearchType;
     }
 
+    /**
+     * Gets the last selected result.
+     * @return
+     */
     public LibraryEntry getLastSelected() {
         return lastSelected;
     }
 
-    public void setLastSelected(LibraryEntry lastSelected) {
+    /**
+     * Sets the last selected result.
+     * @param lastSelected last selected result
+     */
+    public void setLastSelected(final LibraryEntry lastSelected) {
         this.lastSelected = lastSelected;
     }
 
-    public SearchBar(String user) {
+    /**
+     * Constructor.
+     * @param user user
+     */
+    public SearchBar(final String user) {
         this.results = new ArrayList<>();
         this.user = user;
     }
 
+    /**
+     * Clears the selection.
+     */
     public void clearSelection() {
         lastSelected = null;
         lastSearchType = null;
     }
-    public List<LibraryEntry> search(Filters filters, String type) {
+
+    /**
+     * Searches for a song, playlist, podcast, album, artist, or host.
+     * @param filters filters
+     * @param type type
+     * @return results
+     */
+    public List<LibraryEntry> search(final Filters filters, final String type) {
         List<LibraryEntry> entries;
 
         switch (type) {
@@ -173,7 +223,12 @@ public class SearchBar {
         return this.results;
     }
 
-    public LibraryEntry select(Integer itemNumber) {
+    /**
+     * Selects the result of a search.
+     * @param itemNumber item number
+     * @return selected result
+     */
+    public LibraryEntry select(final Integer itemNumber) {
         if (this.results.size() < itemNumber) {
             results.clear();
 

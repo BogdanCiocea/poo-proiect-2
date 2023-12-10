@@ -112,10 +112,10 @@ public class SearchBar {
      */
     public List<LibraryEntry> search(final Filters filters, final String type) {
         List<LibraryEntry> entries;
-
+        Admin admin = Admin.getInstance();
         switch (type) {
             case "song":
-                entries = new ArrayList<>(Admin.getSongs());
+                entries = new ArrayList<>(admin.getSongs());
 
                 if (filters.getName() != null) {
                     entries = filterByName(entries, filters.getName());
@@ -147,7 +147,7 @@ public class SearchBar {
 
                 break;
             case "playlist":
-                entries = new ArrayList<>(Admin.getPlaylists());
+                entries = new ArrayList<>(admin.getPlaylists());
 
                 entries = filterByPlaylistVisibility(entries, user);
 
@@ -165,7 +165,7 @@ public class SearchBar {
 
                 break;
             case "podcast":
-                entries = new ArrayList<>(Admin.getPodcasts());
+                entries = new ArrayList<>(admin.getPodcasts());
 
                 if (filters.getName() != null) {
                     entries = filterByName(entries, filters.getName());
@@ -177,14 +177,14 @@ public class SearchBar {
 
                 break;
             case "artist":
-                entries = new ArrayList<>(Admin.getArtistHelpers());
+                entries = new ArrayList<>(admin.getArtistHelpers());
 
                 if (filters.getName() != null) {
                     entries = filterByName(entries, filters.getName());
                 }
                 break;
             case "album":
-                entries = new ArrayList<>(Admin.getAlbumSearchHelpers());
+                entries = new ArrayList<>(admin.getAlbumSearchHelpers());
                 if (filters.getName() != null) {
                     entries = filterByName(entries, filters.getName());
                 }
@@ -201,7 +201,7 @@ public class SearchBar {
                 entries = new ArrayList<>(uniqueEntries);
                 break;
             case "host":
-                entries = new ArrayList<>(Admin.getHostHelpers());
+                entries = new ArrayList<>(admin.getHostHelpers());
                 if (filters.getName() != null) {
                     entries = filterByName(entries, filters.getName());
                 }

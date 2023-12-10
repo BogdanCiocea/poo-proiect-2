@@ -337,7 +337,8 @@ public class User extends AudioCollection {
         if (selected == null) {
             return "The selected ID is too high.";
         }
-        for (User user : Admin.getUsers()) {
+        Admin adminInstance = Admin.getInstance();
+        for (User user : adminInstance.getUsers()) {
             if (user.getUsername().equals(selected.getName())
                     && (user.getType().equals("artist") || user.getType().equals("host"))) {
                 return "Successfully selected %s's page.".formatted(selected.getName());
@@ -777,6 +778,7 @@ public class User extends AudioCollection {
      * @return message
      */
     public String addAlbum(final CommandInput commandInput) {
+        Admin adminInstance = Admin.getInstance();
         if (!this.getType().equals("artist")) {
             return this.getUsername() + " is not an artist.";
         }
@@ -793,7 +795,7 @@ public class User extends AudioCollection {
 
         Album album = new Album(commandInput.getName(), commandInput.getUsername(),
                 commandInput.getDescription(), commandInput.getReleaseYear(),
-                Admin.addSongs(commandInput.getSongs()));
+                adminInstance.addSongs(commandInput.getSongs()));
 
         this.getAlbums().add(album);
 
@@ -810,20 +812,20 @@ public class User extends AudioCollection {
             library.getSongs().add(songInput);
         }
 
-        if (Admin.getArtist(album.getOwner()) != null) {
-            Objects.requireNonNull(Admin.getArtist(album.getOwner())).getAlbums().add(album);
+        if (adminInstance.getArtist(album.getOwner()) != null) {
+            Objects.requireNonNull(adminInstance.getArtist(album.getOwner())).getAlbums().add(album);
         }
         AlbumSearchHelper albumSearchHelper = new AlbumSearchHelper(album.getName(),
                 album.getOwner(), album.getDescription(), album.getSongs());
-        Admin.getAlbumSearchHelpers().add(albumSearchHelper);
+        adminInstance.getAlbumSearchHelpers().add(albumSearchHelper);
 
-        Admin.setSongList(commandInput.getSongs());
-        Admin.getAlbums().add(album);
+        adminInstance.setSongList(commandInput.getSongs());
+        adminInstance.getAlbums().add(album);
 
-        Set<Song> newSongs = new LinkedHashSet<>(Admin.getSongs());
+        Set<Song> newSongs = new LinkedHashSet<>(adminInstance.getSongs());
         for (Song song : newSongs) {
-            if (!Admin.getSongs().contains(song)) {
-                Admin.getSongs().add(song);
+            if (!adminInstance.getSongs().contains(song)) {
+                adminInstance.getSongs().add(song);
             }
         }
 
@@ -901,9 +903,9 @@ public class User extends AudioCollection {
      */
     public String deleteUser() {
         String message = getUsername() + " was successfully deleted.";
-
+        Admin adminInstance = Admin.getInstance();
         if (this.getType() != null && this.getType().equals("host")) {
-            for (User user : Admin.getUsers()) {
+            for (User user : adminInstance.getUsers()) {
                 if (user.getCurrentPage().equals("Host")) {
                     return getUsername() + " can't be deleted.";
                 }
@@ -918,14 +920,14 @@ public class User extends AudioCollection {
                 }
             }
 
-            for (Podcast podcast : Admin.getPodcasts()) {
+            for (Podcast podcast : adminInstance.getPodcasts()) {
                 if (podcast.getOwner().equals(this.getUsername())) {
-                    Admin.getPodcastsList().remove(podcast);
+                    adminInstance.getPodcastsList().remove(podcast);
                 }
             }
-            Admin.getHosts().remove(this);
+            adminInstance.getHosts().remove(this);
         } else if (this.getType() != null && this.getType().equals("artist")) {
-            for (User user : Admin.getUsers()) {
+            for (User user : adminInstance.getUsers()) {
                 if (user.getCurrentPage().equals("Artist")) {
                     return getUsername() + " can't be deleted.";
                 }
@@ -941,31 +943,31 @@ public class User extends AudioCollection {
             }
 
             List<Song> songsToRemove = new ArrayList<>();
-            for (Song song : Admin.getSongs()) {
+            for (Song song : adminInstance.getSongs()) {
                 if (song.getArtist().equals(this.getUsername())) {
-                    Admin.getSongsList().remove(song);
+                    adminInstance.getSongsList().remove(song);
                     songsToRemove.add(song);
                 }
             }
-            for (User user : Admin.getUsers()) {
+            for (User user : adminInstance.getUsers()) {
                 user.getLikedSongs().removeAll(songsToRemove);
             }
-            Admin.getAlbums().removeAll(this.getAlbums());
-            Admin.getArtists().remove(this);
-            for (ArtistHelper artistHelper : Admin.getArtistHelpers()) {
+            adminInstance.getAlbums().removeAll(this.getAlbums());
+            adminInstance.getArtists().remove(this);
+            for (ArtistHelper artistHelper : adminInstance.getArtistHelpers()) {
                 if (artistHelper.getName().equals(this.getUsername())) {
-                    Admin.getArtistHelpers().remove(artistHelper);
+                    adminInstance.getArtistHelpers().remove(artistHelper);
                     break;
                 }
             }
-            for (AlbumSearchHelper albumSearchHelper : Admin.getAlbumSearchHelpers()) {
+            for (AlbumSearchHelper albumSearchHelper : adminInstance.getAlbumSearchHelpers()) {
                 if (albumSearchHelper.getOwner().equals(this.getUsername())) {
-                    Admin.getAlbumSearchHelpers().remove(albumSearchHelper);
+                    adminInstance.getAlbumSearchHelpers().remove(albumSearchHelper);
                     break;
                 }
             }
         } else if (this.getType() == null || this.getType().equals("user")) {
-            for (User user : Admin.getUsers()) {
+            for (User user : adminInstance.getUsers()) {
                 for (Playlist playlist : this.getPlaylists()) {
                     for (Song song : playlist.getSongs()) {
                         if (user.getPlayer().getCurrentAudioFile() != null
@@ -977,14 +979,14 @@ public class User extends AudioCollection {
                 }
             }
 
-            for (Song song : Admin.getSongs()) {
+            for (Song song : adminInstance.getSongs()) {
                 if (this.getLikedSongs().contains(song)) {
                     song.dislike();
                     this.getLikedSongs().remove(song);
                 }
             }
 
-            for (User user : Admin.getUsers()) {
+            for (User user : adminInstance.getUsers()) {
                 for (Playlist playlist : user.getPlaylists()) {
                     if (this.getFollowedPlaylists().contains(playlist)) {
                         playlist.decreaseFollowers();
@@ -992,13 +994,13 @@ public class User extends AudioCollection {
                 }
             }
 
-            for (User user : Admin.getUsers()) {
+            for (User user : adminInstance.getUsers()) {
                 for (Playlist playlist : this.getPlaylists()) {
                     user.getFollowedPlaylists().remove(playlist);
                 }
             }
-            Admin.getPlaylists().removeAll(this.getPlaylists());
-            Admin.getUsers().remove(this);
+            adminInstance.getPlaylists().removeAll(this.getPlaylists());
+            adminInstance.getUsers().remove(this);
         }
 
         return message;
@@ -1025,7 +1027,8 @@ public class User extends AudioCollection {
      * @return message
      */
     public String removeAlbum(final String username, final String albumName) {
-        User artist = Admin.getUser(username);
+        Admin adminInstance = Admin.getInstance();
+        User artist = adminInstance.getUser(username);
         assert artist != null;
         if (!artist.getType().equals("artist")) {
             return artist.getUsername() + " is not an artist.";
@@ -1041,7 +1044,7 @@ public class User extends AudioCollection {
         if (ok == 0) {
             return artist.getUsername() + " doesn't have an album with the given name.";
         }
-        for (User user : Admin.getUsers()) {
+        for (User user : adminInstance.getUsers()) {
             for (Album album : artist.getAlbums()) {
                 for (Song song : album.getSongs()) {
                     if (user.getPlayer().getCurrentAudioFile() != null
@@ -1053,7 +1056,7 @@ public class User extends AudioCollection {
             }
         }
 
-        for (User user : Admin.getUsers()) {
+        for (User user : adminInstance.getUsers()) {
             for (Playlist playlist : user.getPlaylists()) {
                 for (Song song : artist.getAlbum(albumName).getSongs()) {
                     for (Song song1 : playlist.getSongs()) {
@@ -1065,21 +1068,15 @@ public class User extends AudioCollection {
             }
         }
 
-        for (User user : Admin.getUsers()) {
+        for (User user : adminInstance.getUsers()) {
             user.getLikedSongs().removeIf(song1 -> song1.matchesAlbum(albumName));
         }
-//        for (User user : Admin.getUsers()) {
-//            for (Playlist playlist : user.getPlaylists()) {
-//                user.getPlaylist(playlist.getName()).getSongs()
-//                        .removeIf(song -> song.getAlbum().equals(albumName));
-//            }
-//        }
-        for (Song song : Admin.getSongs()) {
+        for (Song song : adminInstance.getSongs()) {
             if (song.getAlbum().equals(albumName)) {
-                Admin.getSongsList().remove(song);
+                adminInstance.getSongsList().remove(song);
             }
         }
-        Admin.getAlbums().remove(artist.getAlbum(albumName));
+        adminInstance.getAlbums().remove(artist.getAlbum(albumName));
         artist.getAlbums().remove(artist.getAlbum(albumName));
 
         return artist.getUsername() + " deleted the album successfully.";
@@ -1118,6 +1115,7 @@ public class User extends AudioCollection {
      * @return message
      */
     public String addPodcast(final CommandInput commandInput) {
+        Admin adminInstance = Admin.getInstance();
         String message = this.getUsername() + " has added new podcast successfully.";
         int ok = 1;
         if (this.getType() == null || !this.getType().equals("host")) {
@@ -1145,8 +1143,8 @@ public class User extends AudioCollection {
         Podcast newPodcast = new Podcast(commandInput.getName(),
                 commandInput.getUsername(), newEpisodes);
 //        if (!Admin.getPodcasts().contains(newPodcast))
-        if (ok == 1 && !Admin.getPodcasts().contains(newPodcast)) {
-            Admin.getAdminPodcasts().add(newPodcast);
+        if (ok == 1 && !adminInstance.getPodcasts().contains(newPodcast)) {
+            adminInstance.getAdminPodcasts().add(newPodcast);
         }
 
         if (ok == 1) {
@@ -1176,8 +1174,8 @@ public class User extends AudioCollection {
         if (ok == 0) {
             return this.getUsername() + " doesn't have a podcast with the given name.";
         }
-
-        for (User user : Admin.getUsers()) {
+        Admin adminInstance = Admin.getInstance();
+        for (User user : adminInstance.getUsers()) {
             if (user.getPlayer().getSource() != null
                     && user.getPlayer().getSource().getAudioCollection() != null
                     && user.getPlayer().getSource().getAudioCollection().getName()
@@ -1186,9 +1184,9 @@ public class User extends AudioCollection {
             }
         }
 
-        for (Podcast podcast : Admin.getPodcasts()) {
+        for (Podcast podcast : adminInstance.getPodcasts()) {
             if (podcast.getName().equals(commandInput.getName())) {
-                Admin.getPodcastsList().remove(podcast);
+                adminInstance.getPodcastsList().remove(podcast);
             }
         }
         this.getPodcasts().removeIf(podcast -> podcast.getName().equals(commandInput.getName()));

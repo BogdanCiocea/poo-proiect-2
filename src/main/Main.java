@@ -74,13 +74,13 @@ public final class Main {
                 + "library/library.json"), LibraryInput.class);
         CommandInput[] commands = objectMapper.readValue(new File(filePath1), CommandInput[].class);
         ArrayNode outputs = objectMapper.createArrayNode();
-
-        Admin.setUsers(library.getUsers());
-        Admin.setSongs(library.getSongs());
-        Admin.setPodcasts(library.getPodcasts());
+        Admin adminInstance = Admin.getInstance();
+        adminInstance.setUsers(library.getUsers());
+        adminInstance.setSongs(library.getSongs());
+        adminInstance.setPodcasts(library.getPodcasts());
 
         for (CommandInput command : commands) {
-            Admin.updateTimestamp(command.getTimestamp());
+            adminInstance.updateTimestamp(command.getTimestamp());
 
             String commandName = command.getCommand();
 
@@ -135,6 +135,6 @@ public final class Main {
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), outputs);
 
-        Admin.reset();
+        adminInstance.reset();
     }
 }

@@ -217,11 +217,14 @@ public class User extends AudioCollection {
      * @return message
      */
     public String switchConnectionStatus() {
+        // Check if the user is a host or an artist
         if (this.getType() != null && (this.getType().equals("artist")
                 || this.getType().equals("host"))) {
             return this.getUsername() + " is not a normal user.";
         }
+        // Switch the connection status
         onlineStatus = !onlineStatus;
+        // Return a success message
         return username + " has changed status successfully.";
     }
     /**
@@ -470,17 +473,18 @@ public class User extends AudioCollection {
      */
     public String addAnnouncement(final String name, final String description) {
         String message = this.getUsername() + " has successfully added new announcement.";
-
+        // Check if the user is a host
         if (this.getType() == null || !this.getType().equals("host")) {
             return this.getUsername() + " is not a host.";
         }
+        // Check if the user already has an announcement with the given name
         for (Announcement announcement : this.getAnnouncements()) {
             if (announcement.getName().equals(name)) {
                 return this.getUsername() + "  has already added an announcement with this name.";
             }
         }
+        // Add the new announcement to the user's list of announcements
         this.getAnnouncements().add(new Announcement(name, description));
-
         return message;
     }
 
@@ -490,15 +494,18 @@ public class User extends AudioCollection {
      * @return message
      */
     public String removeAnnouncement(final String name) {
+        // Check if the user is a host
         if (this.getType() != null && !this.getType().equals("host")) {
             return this.getUsername() + " is not a host.";
         }
+        // Verify that the user has an announcement with the given name
         for (Announcement announcement : this.getAnnouncements()) {
             if (announcement.getName().equals(name)) {
                 this.getAnnouncements().remove(announcement);
                 return this.getUsername() + " has successfully deleted the announcement.";
             }
         }
+        // Returns an error message if the user doesn't have an announcement with the given name
         return this.getUsername() + " has no announcement with the given name.";
     }
 
@@ -778,50 +785,65 @@ public class User extends AudioCollection {
      * @return message
      */
     public String addAlbum(final CommandInput commandInput) {
+        // Get the singleton instance of Admin
         Admin adminInstance = Admin.getInstance();
+
+        // Check if the current user is an artist
         if (!this.getType().equals("artist")) {
             return this.getUsername() + " is not an artist.";
         }
+
+        // Check if the artist already has an album with the same name
         if (this.getAlbum(commandInput.getName()) != null) {
             return commandInput.getUsername() + " has another album with the same name.";
         }
+
+        // Create a set to ensure all songs on the album are unique
         HashSet<String> uniqueSongs = new HashSet<>();
         for (SongInput songInput : commandInput.getSongs()) {
             if (!uniqueSongs.add(songInput.getName())) {
-                return commandInput.getUsername()
-                        + " has the same song at least twice in this album.";
+                return commandInput.getUsername() + " has the same song at least twice in this album.";
             }
         }
 
+        // Create a new album with the provided details
         Album album = new Album(commandInput.getName(), commandInput.getUsername(),
                 commandInput.getDescription(), commandInput.getReleaseYear(),
                 adminInstance.addSongs(commandInput.getSongs()));
 
+        // Add the new album to the artist's album list
         this.getAlbums().add(album);
 
+        // ObjectMapper is used to serialize/deserialize JSON content
         ObjectMapper objectMapper = new ObjectMapper();
         LibraryInput library;
         try {
-            library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH
-                    + "library/library.json"), LibraryInput.class);
+            // Read existing library data from a JSON file
+            library = objectMapper.readValue(new File(CheckerConstants.TESTS_PATH + "library/library.json"), LibraryInput.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // Throw an exception in case of a read error
         }
 
+        // Add new songs from the album to the library
         for (SongInput songInput : commandInput.getSongs()) {
             library.getSongs().add(songInput);
         }
 
+        // If the artist exists in the admin's records, add the new album to their record
         if (adminInstance.getArtist(album.getOwner()) != null) {
             Objects.requireNonNull(adminInstance.getArtist(album.getOwner())).getAlbums().add(album);
         }
+
+        // Add a new AlbumSearchHelper for the newly added album
         AlbumSearchHelper albumSearchHelper = new AlbumSearchHelper(album.getName(),
                 album.getOwner(), album.getDescription(), album.getSongs());
         adminInstance.getAlbumSearchHelpers().add(albumSearchHelper);
 
+        // Update the global song list in Admin with the new songs
         adminInstance.setSongList(commandInput.getSongs());
         adminInstance.getAlbums().add(album);
 
+        // Ensure that the global songs list in Admin is updated with any new songs
         Set<Song> newSongs = new LinkedHashSet<>(adminInstance.getSongs());
         for (Song song : newSongs) {
             if (!adminInstance.getSongs().contains(song)) {
@@ -829,8 +851,10 @@ public class User extends AudioCollection {
             }
         }
 
+        // Return a success message
         return commandInput.getUsername() + " has added new album successfully.";
     }
+
 
     /**
      * Adds an event
@@ -880,7 +904,6 @@ public class User extends AudioCollection {
         if (this.getType() != null && !this.getType().equals("artist")) {
             return this.getUsername() + " is not an artist.";
         }
-
         int ok = 0;
         for (Event event : this.getEvents()) {
             if (event.getName().equals(eventName)) {
@@ -888,12 +911,10 @@ public class User extends AudioCollection {
                 break;
             }
         }
-
         if (ok == 0) {
             return this.getUsername() + " doesn't have an event with the given name.";
         }
         this.getEvents().removeIf(event -> event.getName().equals(eventName));
-
         return this.getUsername() + " deleted the event successfully.";
     }
 
@@ -902,13 +923,21 @@ public class User extends AudioCollection {
      * @return message
      */
     public String deleteUser() {
+        // Initialize the message assuming the user will be deleted successfully
         String message = getUsername() + " was successfully deleted.";
+
+        // Get the singleton instance of Admin to access global data
         Admin adminInstance = Admin.getInstance();
+
+        // Check if the user is a host
         if (this.getType() != null && this.getType().equals("host")) {
+            // Iterate through all users to check if any conditions prevent deletion
             for (User user : adminInstance.getUsers()) {
+                // Check if any user is on the host's page
                 if (user.getCurrentPage().equals("Host")) {
                     return getUsername() + " can't be deleted.";
                 }
+                // Check if any user is playing an episode from the host's podcast
                 for (Podcast podcast : this.getPodcasts()) {
                     for (Episode episode : podcast.getEpisodes()) {
                         if (user.getPlayer().getSource() != null
@@ -920,13 +949,16 @@ public class User extends AudioCollection {
                 }
             }
 
+            // Remove the host's podcasts and the host from the Admin's lists
             for (Podcast podcast : adminInstance.getPodcasts()) {
                 if (podcast.getOwner().equals(this.getUsername())) {
                     adminInstance.getPodcastsList().remove(podcast);
                 }
             }
             adminInstance.getHosts().remove(this);
+
         } else if (this.getType() != null && this.getType().equals("artist")) {
+            // Similar checks and removals for an artist user
             for (User user : adminInstance.getUsers()) {
                 if (user.getCurrentPage().equals("Artist")) {
                     return getUsername() + " can't be deleted.";
@@ -942,6 +974,7 @@ public class User extends AudioCollection {
                 }
             }
 
+            // Additional removals for artist's songs and albums
             List<Song> songsToRemove = new ArrayList<>();
             for (Song song : adminInstance.getSongs()) {
                 if (song.getArtist().equals(this.getUsername())) {
@@ -954,6 +987,7 @@ public class User extends AudioCollection {
             }
             adminInstance.getAlbums().removeAll(this.getAlbums());
             adminInstance.getArtists().remove(this);
+            // Removing artist from helper lists
             for (ArtistHelper artistHelper : adminInstance.getArtistHelpers()) {
                 if (artistHelper.getName().equals(this.getUsername())) {
                     adminInstance.getArtistHelpers().remove(artistHelper);
@@ -966,7 +1000,9 @@ public class User extends AudioCollection {
                     break;
                 }
             }
+
         } else if (this.getType() == null || this.getType().equals("user")) {
+            // Deleting a normal user
             for (User user : adminInstance.getUsers()) {
                 for (Playlist playlist : this.getPlaylists()) {
                     for (Song song : playlist.getSongs()) {
@@ -979,13 +1015,13 @@ public class User extends AudioCollection {
                 }
             }
 
+            // Remove the user's liked songs and decrease followers count for followed playlists
             for (Song song : adminInstance.getSongs()) {
                 if (this.getLikedSongs().contains(song)) {
                     song.dislike();
                     this.getLikedSongs().remove(song);
                 }
             }
-
             for (User user : adminInstance.getUsers()) {
                 for (Playlist playlist : user.getPlaylists()) {
                     if (this.getFollowedPlaylists().contains(playlist)) {
@@ -994,6 +1030,7 @@ public class User extends AudioCollection {
                 }
             }
 
+            // Remove the user from another user's followed playlists and from Admin's user list
             for (User user : adminInstance.getUsers()) {
                 for (Playlist playlist : this.getPlaylists()) {
                     user.getFollowedPlaylists().remove(playlist);
@@ -1003,8 +1040,10 @@ public class User extends AudioCollection {
             adminInstance.getUsers().remove(this);
         }
 
+        // Return the success message if the user was successfully deleted
         return message;
     }
+
 
     /**
      * Gets the playlist with the given name
@@ -1027,35 +1066,45 @@ public class User extends AudioCollection {
      * @return message
      */
     public String removeAlbum(final String username, final String albumName) {
+        // Get the singleton instance of Admin to access the user and album data
         Admin adminInstance = Admin.getInstance();
+
+        // Retrieve the user supposed to be the artist
         User artist = adminInstance.getUser(username);
-        assert artist != null;
+        assert artist != null; // Ensure that the artist is not null
+
+        // Check if the user is an artist
         if (!artist.getType().equals("artist")) {
             return artist.getUsername() + " is not an artist.";
         }
+
+        // Check if the artist has an album with the given name
         int ok = 0;
         for (Album album : artist.getAlbums()) {
             if (album.getName().equals(albumName)) {
-                ok = 1;
+                ok = 1; // Album found
                 break;
             }
         }
 
+        // Return an error message if the album is not found
         if (ok == 0) {
             return artist.getUsername() + " doesn't have an album with the given name.";
         }
+
+        // Check if any user is currently playing a song from the album
         for (User user : adminInstance.getUsers()) {
             for (Album album : artist.getAlbums()) {
                 for (Song song : album.getSongs()) {
                     if (user.getPlayer().getCurrentAudioFile() != null
-                            && song.getName().equals(user.getPlayer()
-                            .getCurrentAudioFile().getName())) {
+                            && song.getName().equals(user.getPlayer().getCurrentAudioFile().getName())) {
                         return artist.getUsername() + " can't delete this album.";
                     }
                 }
             }
         }
 
+        // Check if any song from the album is in any user's playlist
         for (User user : adminInstance.getUsers()) {
             for (Playlist playlist : user.getPlaylists()) {
                 for (Song song : artist.getAlbum(albumName).getSongs()) {
@@ -1068,19 +1117,26 @@ public class User extends AudioCollection {
             }
         }
 
+        // Remove the album's songs from all users' liked songs
         for (User user : adminInstance.getUsers()) {
             user.getLikedSongs().removeIf(song1 -> song1.matchesAlbum(albumName));
         }
+
+        // Remove the album's songs from the global songs list
         for (Song song : adminInstance.getSongs()) {
             if (song.getAlbum().equals(albumName)) {
                 adminInstance.getSongsList().remove(song);
             }
         }
+
+        // Finally, remove the album from the global albums list and the artist's album list
         adminInstance.getAlbums().remove(artist.getAlbum(albumName));
         artist.getAlbums().remove(artist.getAlbum(albumName));
 
+        // Return a success message
         return artist.getUsername() + " deleted the album successfully.";
     }
+
 
     /**
      * Adds a merch item
@@ -1089,9 +1145,11 @@ public class User extends AudioCollection {
      */
     public String addMerch(final CommandInput commandInput) {
         String message;
+        // If the user is not an artist, return an error message
         if (!this.getType().equals("artist")) {
             return commandInput.getUsername() + " is not an artist.";
         }
+        // Check if the artist already has a merch item with the same name
         if (this.getMerches() != null) {
             for (Merch merch : this.getMerches()) {
                 if (merch.getName().equals(commandInput.getName())) {
@@ -1099,9 +1157,11 @@ public class User extends AudioCollection {
                 }
             }
         }
+        // Check if the price is negative
         if (commandInput.getPrice() < 0) {
             return "Price for merchandise can not be negative.";
         }
+        // Merchandise is added successfully
         message = this.getUsername() + " has added new merchandise successfully.";
         Merch merch = new Merch(commandInput.getName(),
                 commandInput.getDescription(), commandInput.getPrice());
@@ -1142,7 +1202,6 @@ public class User extends AudioCollection {
 
         Podcast newPodcast = new Podcast(commandInput.getName(),
                 commandInput.getUsername(), newEpisodes);
-//        if (!Admin.getPodcasts().contains(newPodcast))
         if (ok == 1 && !adminInstance.getPodcasts().contains(newPodcast)) {
             adminInstance.getAdminPodcasts().add(newPodcast);
         }
@@ -1159,38 +1218,57 @@ public class User extends AudioCollection {
      * @return message
      */
     public String removePodcast(final CommandInput commandInput) {
+        // Initialize the success message assuming the podcast will be deleted successfully
         String message = this.getUsername() + " deleted the podcast successfully.";
+
+        // Check if the current user is a host, as only hosts can remove podcasts
         if (!this.getType().equals("host")) {
+            // If the user is not a host, return an error message
             message = this.getUsername() + " is not a host.";
         }
+
+        // Initialize a flag to check if the podcast exists
         int ok = 0;
+
+        // Iterate through the user's podcasts to find the one to be removed
         for (Podcast podcast : this.getPodcasts()) {
             if (podcast.getName().equals(commandInput.getName())) {
-                ok = 1;
+                ok = 1; // Set the flag if the podcast is found
                 break;
             }
         }
 
+        // Check if the podcast was found
         if (ok == 0) {
+            // If not found, return an error message
             return this.getUsername() + " doesn't have a podcast with the given name.";
         }
+
+        // Get the singleton instance of Admin to access the global list of users
         Admin adminInstance = Admin.getInstance();
+
+        // Check if any user is currently playing the podcast to be deleted
         for (User user : adminInstance.getUsers()) {
             if (user.getPlayer().getSource() != null
                     && user.getPlayer().getSource().getAudioCollection() != null
                     && user.getPlayer().getSource().getAudioCollection().getName()
                     .equals(commandInput.getName()) && !user.getPlayer().getPaused()) {
+                // If the podcast is being played and not paused, return an error message
                 return commandInput.getUsername() + " can't delete this podcast.";
             }
         }
 
+        // Remove the podcast from the global podcasts list in Admin
         for (Podcast podcast : adminInstance.getPodcasts()) {
             if (podcast.getName().equals(commandInput.getName())) {
                 adminInstance.getPodcastsList().remove(podcast);
             }
         }
+
+        // Remove the podcast from the user's (host's) list of podcasts
         this.getPodcasts().removeIf(podcast -> podcast.getName().equals(commandInput.getName()));
 
+        // Return the success message
         return message;
     }
 
@@ -1199,8 +1277,9 @@ public class User extends AudioCollection {
      * @param time time
      */
     public void simulateTime(final int time) {
-        if (this.onlineStatus)
+        if (this.onlineStatus) {
             player.simulatePlayer(time);
+        }
     }
     /**
      * Gets the number of songs

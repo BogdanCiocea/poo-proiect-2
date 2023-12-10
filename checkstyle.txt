@@ -1,7 +1,8 @@
 Starting audit...
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/searchBar/FilterUtils.java:8:1: Utility classes should not have a public or default constructor. [HideUtilityClassConstructor]
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/CommandRunner.java:29:1: Utility classes should not have a public or default constructor. [HideUtilityClassConstructor]
-[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/CommandRunner.java:687: Line is longer than 100 characters (found 101). [LineLength]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/CommandRunner.java:611: Line is longer than 100 characters (found 107). [LineLength]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/CommandRunner.java:659:5: Method length is 182 lines (max allowed is 150). [MethodLength]
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/player/Player.java:170:66: 'type' hides a field. [HiddenField]
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/player/Player.java:234:32: Parameter time should be final. [FinalParameters]
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/Admin.java:18:17: Using the '.*' form of import should be avoided - java.util.*. [AvoidStarImport]
@@ -18,10 +19,12 @@ Starting audit...
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/audio/Files/Song.java:89:47: 'artist' hides a field. [HiddenField]
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/audio/Files/Song.java:94:52: 'releaseYear' hides a field. [HiddenField]
 [ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:5:29: Using the '.*' form of import should be avoided - app.audio.Collections.*. [AvoidStarImport]
-[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:309:73: 'type' hides a field. [HiddenField]
-[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:681:16: 'type' hides a field. [HiddenField]
-[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:816: Line is longer than 100 characters (found 101). [LineLength]
-[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:1029:44: 'username' hides a field. [HiddenField]
-[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:1202:9: 'if' construct must use '{}'s. [NeedBraces]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:312:73: 'type' hides a field. [HiddenField]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:688:16: 'type' hides a field. [HiddenField]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:805: Line is longer than 100 characters (found 103). [LineLength]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:822: Line is longer than 100 characters (found 129). [LineLength]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:834: Line is longer than 100 characters (found 101). [LineLength]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:1068:44: 'username' hides a field. [HiddenField]
+[ERROR] /home/bogdan/Desktop/poo-proiect-2/./src/app/user/User.java:1100: Line is longer than 100 characters (found 105). [LineLength]
 Audit done.
-Checkstyle ends with 24 errors.
+Checkstyle ends with 27 errors.

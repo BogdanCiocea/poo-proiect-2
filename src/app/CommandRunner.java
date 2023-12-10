@@ -598,34 +598,58 @@ public class CommandRunner {
      * @return the result of the change
      */
     public static ObjectNode changePage(final CommandInput commandInput) {
+        // Get the singleton instance of Admin
         Admin adminInstance = Admin.getInstance();
+
+        // Retrieve the user based on the username provided in the command input
         User user = adminInstance.getUser(commandInput.getUsername());
 
+        // Ensure the user object is not null
         assert user != null;
-        String message = user.getUsername() + " accessed "
-                + commandInput.getNextPage() + " successfully.";
 
+        // Initialize a message indicating the user accessed the new page successfully
+        String message = user.getUsername() + " accessed " + commandInput.getNextPage() + " successfully.";
+
+        // Check if the user is trying to access the 'Artist' page but is not an artist
         if (commandInput.getNextPage().equals("Artist") && !user.getType().equals("artist")) {
-            message = user.getUsername() + "is trying to access a non-existent page.";
+            // Update the message to indicate the user is trying to access a non-existent page
+            message = user.getUsername() + " is trying to access a non-existent page.";
         }
 
+        // Check if the user is trying to access the 'Host' page but is not a host
         if (commandInput.getNextPage().equals("Host") && !user.getType().equals("host")) {
-            message = user.getUsername() + "is trying to access a non-existent page.";
+            // Update the message to indicate the user is trying to access a non-existent page
+            message = user.getUsername() + " is trying to access a non-existent page.";
         }
 
+        // Check if the user is offline
         if (!user.getOnlineStatus()) {
+            // Update the message to indicate the user is offline
             message = user.getUsername() + " is offline.";
         } else {
+            // If the user is online, update their current page
             user.setCurrentPage(commandInput.getNextPage());
         }
+
+        // Create an ObjectNode to structure the response data
         ObjectNode objectNode = objectMapper.createObjectNode();
+
+        // Populate the response with the command information
         objectNode.put("command", commandInput.getCommand());
+
+        // Populate the response with the username
         objectNode.put("user", commandInput.getUsername());
+
+        // Populate the response with the timestamp
         objectNode.put("timestamp", commandInput.getTimestamp());
+
+        // Populate the response with the message
         objectNode.put("message", message);
 
+        // Return the structured response
         return objectNode;
     }
+
 
     /**
      * Prints the current page of a user
@@ -633,125 +657,186 @@ public class CommandRunner {
      * @return the result of the print
      */
     public static ObjectNode printCurrentPage(final CommandInput commandInput) {
+        // Get the singleton instance of Admin
         Admin adminInstance = Admin.getInstance();
-        User user = adminInstance.getUser(commandInput.getUsername());
-        String message = "mama ta";
-        assert user != null;
-        List<Song> likedSongs = new ArrayList<>(user.getLikedSongs());
-        boolean dewIt = user.getOnlineStatus();
-        if (dewIt) {
-            likedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
-            List<Song> topLikedSongs = likedSongs.stream().limit(MAX_SIZE).toList();
-            List<Playlist> followedPlaylists = new ArrayList<>(user.getFollowedPlaylists());
-            followedPlaylists.sort(Comparator.comparingInt(Playlist::getFollowers).reversed());
-            List<Playlist> topFollowedPlaylists =
-                    followedPlaylists.stream().limit(MAX_SIZE).collect(Collectors.toList());
 
+        // Retrieve the user based on the username provided in the command input
+        User user = adminInstance.getUser(commandInput.getUsername());
+
+        // Initialize a placeholder message, likely for debugging or as a default
+        String message = "mama ta";
+
+        // Ensure the user object is not null
+        assert user != null;
+
+        // Retrieve and create a list of songs liked by the user
+        List<Song> likedSongs = new ArrayList<>(user.getLikedSongs());
+
+        // Check the online status of the user
+        boolean dewIt = user.getOnlineStatus();
+
+        // If the user is online
+        if (dewIt) {
+            // Sort liked songs by the number of likes
+            likedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
+            // Get the top liked songs limited by MAX_SIZE
+            List<Song> topLikedSongs = likedSongs.stream().limit(MAX_SIZE).toList();
+            // List of followed playlists
+            List<Playlist> followedPlaylists = new ArrayList<>(user.getFollowedPlaylists());
+            // Sort playlists by the number of followers
+            followedPlaylists.sort(Comparator.comparingInt(Playlist::getFollowers).reversed());
+
+            // Get top followed playlists limited by MAX_SIZE
+            List<Playlist> topFollowedPlaylists = followedPlaylists.stream().limit(MAX_SIZE)
+                    .collect(Collectors.toList());
+            // Initialize list for top songs names
             List<String> topSongs = new ArrayList<>();
+            // Loop through top liked songs
             for (Song song : topLikedSongs) {
+                // Add song names to the list
                 topSongs.add(song.getName());
             }
+            // List for liked songs with details
             List<String> likedPageSongs = new ArrayList<>();
+            // Loop through top liked songs
             for (Song song : topLikedSongs) {
+                // Add song details to the list
                 likedPageSongs.add(song.getName() + " - " + song.getArtist());
             }
+            // List for followed playlists with details
             List<String> likedPagePlaylists = new ArrayList<>();
+            // Loop through top followed playlists
             for (Playlist playlist : topFollowedPlaylists) {
+                // Add playlist details to the list
                 likedPagePlaylists.add(playlist.getName() + " - " + playlist.getOwner());
             }
-
+            // Check again if user is online
             if (!user.getOnlineStatus()) {
+                // Update message for offline status
                 message = commandInput.getUsername() + " is offline.";
+                // If the current page is Home
             } else if (user.getCurrentPage().equals("Home")) {
+                // Format the top songs and playlists for display
                 String formattedTopSongs = topSongs.stream()
                         .collect(Collectors.joining(", "));
                 String formattedTopPlaylists = topFollowedPlaylists.stream()
-                        .map(LibraryEntry::getName)
-                        .collect(Collectors.joining(", "));
+                        .map(LibraryEntry::getName).collect(Collectors.joining(", "));
 
-                message = "Liked songs:\n\t[" + formattedTopSongs
-                        + "]\n\nFollowed playlists:\n\t[" + formattedTopPlaylists + "]";
+                // Construct the message for the Home page
+                message = "Liked songs:\n\t[" + formattedTopSongs + "]\n\nFollowed playlists:\n\t["
+                        + formattedTopPlaylists + "]";
+                // If the current page is LikedContent
             } else if (user.getCurrentPage().equals("LikedContent")) {
+                // Process and display liked songs and playlists
                 List<Song> likedS0ngs = user.getLikedSongs();
-                //likedS0ngs.sort(Comparator.comparingInt(Song::getLikes).reversed());
-
                 List<String> likedSongsString = new ArrayList<>();
                 for (Song song : likedS0ngs) {
                     likedSongsString.add(song.getName() + " - " + song.getArtist());
                 }
-                //Collections.sort(likedSongsString);
-                message = "Liked songs:\n\t" + likedSongsString
-                        + "\n\nFollowed playlists:\n\t" + likedPagePlaylists;
-            } else if (user.getCurrentPage().equals("Artist")
-                    && user.getSearchBar().getLastSelected() != null) {
-                User artist = adminInstance.getUser(user.getSearchBar().getLastSelected().getName());
+                message = "Liked songs:\n\t" + likedSongsString + "\n\nFollowed playlists:\n\t"
+                        + likedPagePlaylists;
+                // If on Artist page
+            } else if (user.getCurrentPage().equals("Artist") && user.getSearchBar()
+                    .getLastSelected() != null) {
+                // Get the selected artist's details
+                User artist = adminInstance.getUser(user.getSearchBar().getLastSelected()
+                        .getName());
                 List<String> albums = new ArrayList<>();
+                // If artist exists
                 if (artist != null) {
+                    // Collect album names
                     for (Album album : artist.getAlbums()) {
                         albums.add(album.getName());
                     }
+                    // Collect merchandise details
                     List<String> merches = new ArrayList<>();
                     for (Merch merch1 : artist.getMerches()) {
-                        merches.add(merch1.getName() + " - "
-                                + merch1.getPrice() + ":\n\t" + merch1.getDescription());
+                        merches.add(merch1.getName() + " - " + merch1.getPrice()
+                                + ":\n\t" + merch1.getDescription());
                     }
+                    // Collect event details
                     List<String> artistEvents = new ArrayList<>();
                     for (Event event : artist.getEvents()) {
-                        artistEvents.add(event.getName() + " - "
-                                + event.getDate() + ":\n\t" + event.getDescription());
+                        artistEvents.add(event.getName() + " - " + event.getDate()
+                                + ":\n\t" + event.getDescription());
                     }
-                    message = "Albums:\n\t" + albums + "\n\nMerch:\n\t"
-                            + merches + "\n\nEvents:\n\t" + artistEvents;
+                    // Construct the message for the Artist page
+                    message = "Albums:\n\t" + albums + "\n\nMerch:\n\t" + merches
+                            + "\n\nEvents:\n\t" + artistEvents;
                 } else {
+                    // Use last page message if artist not found
                     message = user.getLastPageMessage();
                 }
+                // If on Host page
             } else if (user.getCurrentPage().equals("Host")) {
-                User host;
+                User host; // Variable to store the host user
+                // Determine the host user based on the search bar's last selection or the
+                // last user selected
                 if (user.getSearchBar().getLastSelected() != null) {
                     host = adminInstance.getUser(user.getSearchBar().getLastSelected().getName());
                 } else {
                     host = adminInstance.getUser(user.getLastUserSelected());
                 }
+                // If host user is found
                 if (host != null) {
+                    // Prepare a list for podcast details
                     List<String> episodes;
                     List<PodcastPrint> podcastPrints = new ArrayList<>();
+                    // Loop through podcasts
                     for (Podcast podcast : host.getPodcasts()) {
                         episodes = new ArrayList<>();
+                        // Loop through episodes
                         for (Episode episode : podcast.getEpisodes()) {
+                            // Add episode details
                             episodes.add(episode.getName() + " - " + episode.getDescription());
                         }
+                        // Add podcast details
                         podcastPrints.add(new PodcastPrint(podcast.getName(), episodes));
                     }
-
+                    // Prepare a list for announcements
                     List<String> announcements = new ArrayList<>();
+                    // Loop through announcements
                     for (Announcement announcement : host.getAnnouncements()) {
+                        // Add announcement details
                         announcements.add(announcement.getName() + ":\n\t"
                                 + announcement.getDescription() + "\n");
                     }
+                    // Construct the message for the Host page
                     message = "Podcasts:\n\t" + podcastPrints + "\n\nAnnouncements:\n\t"
                             + announcements;
 
+                    // Update the last user selected with the host's username
                     user.setLastUserSelected(host.getUsername());
+                    // If no host is found, use the last page message
                 } else if (user.getLastPageMessage() != null) {
+                    // Use last page message
                     message = user.getLastPageMessage();
                 } else {
+                    // Default message if no host and no last page message
                     message = "Liked songs:\n\t[]\n\nFollowed playlists:\n\t[]";
                 }
             }
+            // Update the last page message of the user
             user.setLastPageMessage(message);
-        } else {
-            message = user.getUsername() + " is offline.";
-        }
+            } else {
+                // If the user is offline, set the message to indicate offline status
+                message = user.getUsername() + " is offline.";
+            }
+        // If the initial placeholder message is still unchanged,
+        // replace it with the last page message
         if (message.equals("mama ta")) {
             message = user.getLastPageMessage();
         }
+        // Create an ObjectNode to structure the response data
         ObjectNode objectNode = objectMapper.createObjectNode();
+        // Populate the response with user details and message
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("message", message);
-
+        // Return the structured response
         return objectNode;
+
     }
 
     /**

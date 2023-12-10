@@ -55,10 +55,6 @@ public class Admin {
         return albumSearchHelpers;
     }
 
-    public List<AlbumHelper> getAlbumHelpers() {
-        return albumHelpers;
-    }
-
     public List<ArtistHelper> getArtistHelpers() {
         return artistHelpers;
     }
@@ -229,6 +225,34 @@ public class Admin {
             user.simulateTime(elapsed);
         }
     }
+
+    public Song getSong(String songName) {
+        for (Song song : songs) {
+            if (song.getName().equals(songName)) {
+                return song;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Updates the song likes
+     */
+    public void updateSongLikes() {
+        for (Song song : admin.getSongs()) {
+            song.setLikes(0);
+        }
+
+        for (User user : users) {
+            for (Song likedSong : user.getLikedSongs()) {
+                Song songInAdmin = admin.getSong(likedSong.getName());
+                if (songInAdmin != null) {
+                    songInAdmin.setLikes(songInAdmin.getLikes() + 1);
+                }
+            }
+        }
+    }
+
     /**
      * Gets the top 5 songs
      * @return the top 5 songs
@@ -237,6 +261,18 @@ public class Admin {
         List<Song> sortedSongs = new ArrayList<>(songs);
         sortedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
         List<String> topSongs = new ArrayList<>();
+        int ok = 0;
+        for (Song song : sortedSongs) {
+            if (song.getLikes() != 0) {
+                ok = 1;
+                break;
+            }
+        }
+        if (ok == 0) {
+            updateSongLikes();
+            sortedSongs = new ArrayList<>(songs);
+            sortedSongs.sort(Comparator.comparingInt(Song::getLikes).reversed());
+        }
         int count = 0;
         for (Song song : sortedSongs) {
             if (count >= TOP_5) {

@@ -15,6 +15,10 @@ public final class Song extends AudioFile {
     private final String artist;
     private Integer likes;
 
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
     public String getAlbum() {
         return album;
     }

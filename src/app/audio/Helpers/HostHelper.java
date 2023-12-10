@@ -1,5 +1,6 @@
-package app.audio.Collections;
+package app.audio.Helpers;
 
+import app.audio.Collections.Podcast;
 import app.audio.LibraryEntry;
 
 import java.util.List;

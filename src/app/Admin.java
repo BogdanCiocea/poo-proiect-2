@@ -1,10 +1,10 @@
 package app;
 
 import app.audio.Collections.Album;
-import app.audio.Collections.AlbumHelper;
-import app.audio.Collections.AlbumSearchHelper;
-import app.audio.Collections.ArtistHelper;
-import app.audio.Collections.HostHelper;
+import app.audio.Helpers.AlbumHelper;
+import app.audio.Helpers.AlbumSearchHelper;
+import app.audio.Helpers.ArtistHelper;
+import app.audio.Helpers.HostHelper;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.Podcast;
 import app.audio.Files.Episode;

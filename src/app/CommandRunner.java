@@ -2,11 +2,11 @@ package app;
 
 import app.announcement.Announcement;
 import app.audio.Collections.Album;
-import app.audio.Collections.AlbumHelper;
-import app.audio.Collections.ArtistHelper;
+import app.audio.Helpers.AlbumHelper;
+import app.audio.Helpers.ArtistHelper;
 import app.audio.Collections.Playlist;
-import app.audio.Collections.PodcastHelper;
-import app.audio.Collections.HostHelper;
+import app.audio.Helpers.PodcastHelper;
+import app.audio.Helpers.HostHelper;
 import app.audio.Collections.Podcast;
 import app.audio.Collections.PlaylistOutput;
 import app.audio.Files.Episode;
@@ -119,9 +119,7 @@ public class CommandRunner {
                     commandInput.getCity());
             newUser.setType(commandInput.getType());
             if (newUser.getType().equals("artist")) {
-                //newUser.switchConnectionStatus();
                 newUser.setOnlineStatus(false);
-                //newUser.getPlayer().setPaused(true);
                 adminInstance.getArtists().add(newUser);
                 ArtistHelper artistHelper = new ArtistHelper(newUser.getUsername(),
                         newUser.getAlbums());
@@ -131,7 +129,6 @@ public class CommandRunner {
                     adminInstance.getHostHelpers().clear();
                 }
                 newUser.setOnlineStatus(false);
-                //newUser.getPlayer().setPaused(true);
                 adminInstance.getHosts().add(newUser);
                 HostHelper hostHelper = new HostHelper(newUser.getUsername(),
                         newUser.getPodcasts());
@@ -836,7 +833,6 @@ public class CommandRunner {
         objectNode.put("message", message);
         // Return the structured response
         return objectNode;
-
     }
 
     /**
@@ -942,20 +938,15 @@ public class CommandRunner {
         Admin adminInstance = Admin.getInstance();
         User user = adminInstance.getUser(commandInput.getUsername());
         ArrayList<PodcastHelper> podcastHelpers = new ArrayList<>();
-
         assert user != null;
         for (Podcast podcast : user.getPodcasts()) {
             PodcastHelper podcastHelper = new PodcastHelper();
-
             for (Episode episode : podcast.getEpisodes()) {
                 podcastHelper.getEpisodes().add(episode.getName());
             }
-
             podcastHelper.setName(podcast.getName());
-
             podcastHelpers.add(podcastHelper);
         }
-
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());

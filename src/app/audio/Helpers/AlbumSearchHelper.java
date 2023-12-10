@@ -1,5 +1,6 @@
-package app.audio.Collections;
+package app.audio.Helpers;
 
+import app.audio.Collections.AudioCollection;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Song;
 

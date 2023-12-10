@@ -6,6 +6,8 @@ import app.audio.Collections.*;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
+import app.audio.Helpers.AlbumSearchHelper;
+import app.audio.Helpers.ArtistHelper;
 import app.audio.LibraryEntry;
 import app.event.Event;
 import app.merch.Merch;
@@ -1043,7 +1045,6 @@ public class User extends AudioCollection {
         // Return the success message if the user was successfully deleted
         return message;
     }
-
 
     /**
      * Gets the playlist with the given name

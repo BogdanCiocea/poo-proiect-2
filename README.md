@@ -1,6 +1,7 @@
 # Proiect GlobalWaves  - Etapa 2
 Ciocea Bogdan-Andrei 323CA
-<div align="center"><img src="https://tenor.com/view/listening-to-music-spongebob-gif-8009182.gif" width="300px"></div>
+(literally Ryan Gosling)
+<div align="center"><img src="https://media1.tenor.com/m/Jsh8LhS7PuYAAAAC/i-drive-drive.gif" width="600px"></div>
 
 #### Assignment Link: [https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/proiect/etapa1](https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/proiect/etapa1)
 
@@ -24,7 +25,7 @@ Ciocea Bogdan-Andrei 323CA
 * input/ - contains the tests and library in JSON format
 * ref/ - contains all reference output for the tests in JSON format
 
-<div align="center"><img src="https://tenor.com/view/homework-time-gif-24854817.gif" width="500px"></div>
+<div align="center"><img src="https://media.tenor.com/dRP_otVcxVkAAAAM/ryan-gosling-car.gif" width="500px"></div>
 
 
 ## Implementation

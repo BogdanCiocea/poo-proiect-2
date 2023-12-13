@@ -7,6 +7,8 @@ Ciocea Bogdan-Andrei 323CA
 
 
 ## Skel Structure
+Am folosit modelul oficial de la etapa 1.
+Am folosit ChatGPT pentru a genera codul de la updateSongLikes si la addAlbum pentru o parte din cod.
 
 * src/
   * checker/ - checker files

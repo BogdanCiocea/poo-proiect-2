@@ -1047,20 +1047,6 @@ public class User extends AudioCollection {
     }
 
     /**
-     * Gets the playlist with the given name
-     * @param playlistName playlistName
-     * @return playlist
-     */
-    public Playlist getPlaylist(final String playlistName) {
-        for (Playlist playlist : this.getPlaylists()) {
-            if (playlist.getName().equals(playlistName)) {
-                return playlist;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Removes an album
      * @param username username
      * @param albumName albumName

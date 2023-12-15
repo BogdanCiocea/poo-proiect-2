@@ -605,7 +605,8 @@ public class CommandRunner {
         assert user != null;
 
         // Initialize a message indicating the user accessed the new page successfully
-        String message = user.getUsername() + " accessed " + commandInput.getNextPage() + " successfully.";
+        String message = user.getUsername() + " accessed " + commandInput.getNextPage()
+                + " successfully.";
 
         // Check if the user is trying to access the 'Artist' page but is not an artist
         if (commandInput.getNextPage().equals("Artist") && !user.getType().equals("artist")) {

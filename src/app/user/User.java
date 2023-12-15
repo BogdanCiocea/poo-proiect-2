@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fileio.input.CommandInput;
 import fileio.input.LibraryInput;
 import fileio.input.SongInput;
-import lombok.Getter;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -35,18 +34,12 @@ import java.util.Objects;
 import java.util.Set;
 
 public class User extends AudioCollection {
-    @Getter
-    private String username;
-    @Getter
-    private int age;
-    @Getter
-    private String city;
-    @Getter
-    private ArrayList<Playlist> playlists;
-    @Getter
-    private ArrayList<Song> likedSongs;
-    @Getter
-    private ArrayList<Playlist> followedPlaylists;
+    private final String username;
+    private final int age;
+    private final String city;
+    private final ArrayList<Playlist> playlists;
+    private final ArrayList<Song> likedSongs;
+    private final ArrayList<Playlist> followedPlaylists;
     private final Player player;
     private final SearchBar searchBar;
     private boolean lastSearched;
